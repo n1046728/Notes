@@ -3,8 +3,9 @@
 >[Day 02 JavaScript 簡介](#day-02-javascript簡介)  
 >[Day 03 變數與資料型別](#day-03-變數與資料型別)  
 >[Day 04 物件、陣列及型別判斷](#day-04-物件陣列及型別判斷)  
->[Day_05_JavaScript_是「傳值」或「傳址」？](#day-05-javascript-是傳值或傳址)  
->[Day 06 運算式與運算子](##Day&nbsp;06&nbsp;運算式與運算子)  
+>[Day 05 JavaScript_是「傳值」或「傳址」？](#day-05-javascript-是傳值或傳址)  
+>[Day 06 運算式與運算子](#Day&nbsp;06&nbsp;運算式與運算子)  
+>[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -275,3 +276,56 @@ var str = "123 加 123 的數字會是" + a + b; //"123 加 123 的數字會是1
 Infinity % 0; //NaN
 100 % Infinity; //100
 ```
+
+## [Day 07 「比較」與自動轉型的規則](https://ithelp.ithome.com.tw/articles/10191254)
+
+### 一元運算子
+* 正號+與負號-  
+  正號與負號後方帶的不是數值型態，則會先透過Number()進行轉型，物件型別則會透過物件的valueOf()先求得對應數值。有時會有人以+取代Number()進行轉型
+  ```javascript
+  var a = "10";
+  console.log(-a); //-10
+
+  var b = "helloworld";
+  console.log(+b); //NaN
+
+  +function(val){return val}; //NaN
+  ```
+* 遞增 ++ 與遞減 --  
+  ```javascript
+  var a = 10;
+  var b = 10;
+  console.log(a++); //10
+  console.log(b++); //11
+  console.log(a); //11
+  console.log(b); //11
+  ``` 
+### 比較運算子(Comparison Operator)
+* 「相等」== 與「全等」===  
+  三個等號 === 與兩個等號 == 雖然都是比較的意思，但最大的差別在於「三個等號 === 不會替數值做自動轉型」。
+  ```javascript
+  false == 0; //true
+  true == 1 ; //true
+  [] == []; //false
+  [] == ![]; // true
+
+  var a = 10;
+  var b = "10";
+  console.log(a === b); //false
+  ```
+* 不等於!=與!==  
+  概念同上
+
+### 自動轉型規則
+* 兩個都是數字，直接比較
+* 字串與數字，字串會透過Number()嘗試轉型為數字後進行比較
+* 其中一方為物件型別與基本型別，物件型別會透過valueOf()取得對應的基本型別後，再進行比較
+
+### 數值的大於 > 與小於 <
+* 兩個都是數字，直接比較
+* 其中一個是數字，另一個則會試圖轉為數字再進行比較
+* 兩者都是字串，則會按字母進行比較standard lexicolgraphical ordering
+* 其中之一是boolean，則true看成1，false看成0
+* 物件則透過valueOf()取得對應的值，若物件沒有valueOf()則透過toString()轉型再比較
+
+### [JS 真值表](https://thomas-yang.me/projects/oh-my-dear-js/)
