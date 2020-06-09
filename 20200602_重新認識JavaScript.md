@@ -5,7 +5,9 @@
 >[Day 04 物件、陣列及型別判斷](#day-04-物件陣列及型別判斷)  
 >[Day 05 JavaScript_是「傳值」或「傳址」？](#day-05-javascript-是傳值或傳址)  
 >[Day 06 運算式與運算子](#Day&nbsp;06&nbsp;運算式與運算子)  
->[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)
+>[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)  
+>[Day 08 Boolean 的真假判斷](#Day-08-Boolean-的真假判斷)  
+>[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -276,6 +278,7 @@ var str = "123 加 123 的數字會是" + a + b; //"123 加 123 的數字會是1
 Infinity % 0; //NaN
 100 % Infinity; //100
 ```
+---
 
 ## [Day 07 「比較」與自動轉型的規則](https://ithelp.ithome.com.tw/articles/10191254)
 
@@ -327,5 +330,68 @@ Infinity % 0; //NaN
 * 兩者都是字串，則會按字母進行比較standard lexicolgraphical ordering
 * 其中之一是boolean，則true看成1，false看成0
 * 物件則透過valueOf()取得對應的值，若物件沒有valueOf()則透過toString()轉型再比較
-
+* 
 ### [JS 真值表](https://thomas-yang.me/projects/oh-my-dear-js/)
+---
+## [Day 08 Boolean 的真假判斷](https://ithelp.ithome.com.tw/articles/10191343)
+### 指派運算子(Assignment Operator)
+| Operator | Actual |
+| -------- | ------ |
+| a+=b     | a=a+b  |
+| a-=b     | a=a-b  |
+| a*=b     | a=a*b  |
+| a/=b     | a=a/b  |
+| a%=b     | a=a%b  |
+
+### 逗號運算子
+分隔運算式可以循序執行(由左至右)並且回傳最後一個運算是值
+* for loop
+* 變數宣告
+  ```javascript
+  for(i = 0,j = 0;i<10;i++,j++){}
+
+  var a =10,b = 10;
+  ```
+  ```javascript
+  (function(){
+    var a = b = 10; //注意此宣告會將b宣告為全域變數
+    console.log(a,b);  
+  })
+  console.log(a,b); //undefined,10
+  ```
+
+### 邏輯運算子(Logical Operator)
+> &&、||、!，有以上三種邏輯運算子，但非boolean遇到邏輯運算子時，會有兩種值，Falsy與Truthy。
+#### Falsy 與 Truthy: 論 Boolean 的型別轉換
+* Falsy
+  > 經過ToBollean轉換為false的值：
+  * undefined
+  * Null
+  * +0,-0,or Null
+  * 空字串""或''
+* Truthy
+  > 其他轉換為true
+
+#### 回到邏輯運算子
+> &&、||、!
+* 如果是Boolean類型就再做後續判斷，否則進行ToBoolean判斷falsy or truthy來轉換
+* 對||來說，若是第一個數值轉換為true，則回傳第一個數值，否則回傳第二個數值
+* 對&&來說，若是第一個數值轉會為true，則回傳第二個數值，否則回傳第一個數值
+* if判斷式中javascript會針對回傳的數值在進行ToBoolean判斷是falsy或truthy
+  ```javascript
+  var a = 123;
+  var b = 'abc';
+  var c = null;
+
+  console.log(a && b); //'abc'
+  console.log(a || b); //123
+  
+  console.log(c && a); //null
+  console.log(c || b); //abc
+  ```
+  ```javascript
+  !!'false' == !!'true'; // true
+  !!'false' === !!'true'; // true
+  ```
+  ---
+  ## [Day 09 流程判斷與迴圈](https://ithelp.ithome.com.tw/articles/10191453)
