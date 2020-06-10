@@ -7,7 +7,8 @@
 >[Day 06 運算式與運算子](#Day&nbsp;06&nbsp;運算式與運算子)  
 >[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)  
 >[Day 08 Boolean 的真假判斷](#Day-08-Boolean-的真假判斷)  
->[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)
+>[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)  
+>[Day 10 函式 Functions 的基本概念](Day-10-函式-Functions-的基本概念)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -394,4 +395,235 @@ Infinity % 0; //NaN
   !!'false' === !!'true'; // true
   ```
   ---
-  ## [Day 09 流程判斷與迴圈](https://ithelp.ithome.com.tw/articles/10191453)
+## [Day 09 流程判斷與迴圈](https://ithelp.ithome.com.tw/articles/10191453)
+### 條件語法(1) if...else
+### 條件語法(2) switch
+```javascript
+var month = 12;
+//Math.ceil(n) 無條件進位
+//for loop
+if(Math.ceil(month/3) === 1){
+  console.log("spring");
+}else if(Math.ceil(month/3) ===2 ){
+  console.log("summer");
+}else if(Math.ceil(month/3) === 3){
+  console.log("fall");
+}else if(Math.ceil(month/3 === 4)){
+  console.log("winter");
+}else{
+  console.log("error month");
+}
+
+//switch
+switch(Math.ceil(month/3)){
+  case 1:
+    console.log("spring");
+    break;
+  case 2:
+    console.log("summer");
+    break;
+  case 3:
+    console.log("fall");
+    break;
+  case 4:
+    console.log("winter");
+  default:
+    console.log("error month");
+    break;
+}
+```
+#### switch注意事項
+```javascript
+//未使用break 造成異常
+var m = 1;
+switch(Month.ceil(m/3)){
+  case 1:
+    console.log("spring");
+  case 2:
+    console.log("summer");
+  case 3:
+    console.log("fall");
+  case 4:
+    console.log("winter");
+  default:
+    console.log("error month");
+}
+//spring
+//summer
+//fall
+//winter
+//error month
+
+//適當使用break
+var m = 1;
+switch(m){
+  case 1:
+  case 2:
+  case 3:
+    console.log("spring");
+    break;
+  case 4:
+  case 5:
+  case 6:
+    console.log("summer");
+    break;
+  case 7:
+  case 8:
+  case 9:
+    console.log("fall");
+    break;
+  case 10:
+  case 11:
+  case 12:
+    console.log("winter");
+    break;
+  default:
+    console.log("error month");
+}
+```
+
+### 三元運算子
+(條件) ? [數值1] : [數值2]
+```javascript
+var status = age > 18 ? '成人' : '小孩';
+```
+
+### 迴圈
+#### for loop
+```javascript
+for (var i = 0; i < 10; i++) {
+  // 做某件事
+}
+console.log(i); //11，在java中會出錯
+```
+**注意變數i的有效範圍與for迴圈相同**
+
+#### while loop
+> 注意結束條件，以免無窮迴圈
+
+#### break 與 continue
+* break：回直接跳出迴圈
+* continue：會跳過一次，然後繼續迴圈
+
+#### for 與 while 兩者的差異點
+* for loop：大多使用在明確狀態
+* while：當迴圈使用在不確定次數時更適合
+  ```javascript
+  //大樂透1~49，選6個號碼
+  var lottery = [];
+  var n;
+  while(lottery.length < 6){
+    //random get num
+    n = Math.floor(Math.random() * 49)+1;
+    if(lottery.indexOf(n) === -1){
+      lottery.push(n);
+    }
+  }
+  ```
+---
+## [Day 10 函式 Functions 的基本概念](https://ithelp.ithome.com.tw/articles/10191549)
+### Function
+> 函式是物件的一種，除了基本型別以外的都是物件，可以想成是一種可以被呼叫(be invoked)的特殊物件
+### 函式定義方式
+* 函式宣告(Function Declaration)
+* 函式運算式(Function Expressions)
+* 透過**new Function**的關鍵字建立函式
+
+#### 函式宣告
+```javascript
+function 名稱([參數]){
+  //do something
+}
+```
+#### 函式運算式
+> 變數名稱 = function([參數]){...};，將一個函式透過=指定給某個變數
+```javascript
+var square = function (number){
+  return number *number ;
+}
+
+//函式加入名字，只作用在自己的函式區塊內
+var square = function func(number){
+  console.log(typeof func); // function
+  console.log(typeof square); //還是可以透過變數名稱取得function
+  return number * number;
+}
+console.log(typeof func); // undefined
+```
+#### new Function關鍵字建立函式
+>注意F大寫，透過new Function建立的函式，每次都會進行解析字串的動作，運作效能差，實務上較少這樣做
+```javascript
+var square = new Function('number','return number * number');
+```
+
+### 變數有效範圍(Scope)
+> ES6以前**變數有效範圍最小的是以function做分界**，ES6 後有let與const他們的scope是透過大括號{ }來切分
+[註2] ES6 之後有 let 與 const 分別定義「變數」與「常數」。 與 var 不同的是，它們的 scope 是透過大括號 { } 來切分的。
+```javascript
+var x = 1 ;
+var doSomeThing = function(){
+  var x = 100;
+  return x+y;
+}
+console.log(doSomeThing(50)); //150
+console.log(x); //1
+```
+```javascript
+var x = 1 ;
+var doSomeThing = function(){
+  //內部找不到x就會到外部找，直到全域變數為止
+  //都沒有就會報錯，ReferenceError:x is not defined
+  return x + y;
+}
+console.log(doSomeThing(50)); //51
+```
+```javascript
+var x = 1 ;
+var doSomeThing = function(){
+  x = 100; //沒有用var宣告
+  return x+y;
+}
+console.log(x); //1
+console.log(doSomeThing(50)); //150
+console.log(x); //100
+```
+#### 變數拉升(Variable Hoisting)
+>由於javascript有這樣的特性，強烈建議所有可能用到的變數都盡量在 scope 的最上面先宣告完成後再使用。
+```javascript
+var x = 1 ;
+var doSomeThing = function(){
+  console.log(x); //undefined 
+  var x = 100;
+  //以上Hoisting等同於
+  // var x;
+  //console.log(x);
+  //x = 100;
+  return x+y;
+}
+console.log(doSomeThing(50)); //150
+console.log(x); //1
+```
+* 透過函式宣告的可以在宣告前使用(函式提升)
+  ```javascript
+  square(2); //4
+  function square(num){
+    return num * num;
+  }
+  ```
+* 透過函式運算式會發生錯誤
+  ```javascript
+  square(2); //TypeError：square is not a function
+  var square = function(num){
+    return num * num;
+  }
+  ```
+### 全域變數與區域變數
+* 全域物件
+  >javascript中沒有所謂全域變數，所以我們說的全域變數其實式全域物件(或叫頂層物件)，全域物件指的就是window，在node環境下叫做global
+* 變數的有效範圍scope的最小切分為function(ES6中的let與const除外)
+* 寫在函式內但沒有var的變數會變成全域變數
+* 全域變數指的是全域物件(頂層物件)的屬性
+  ```javascript
+  var a = 10;
+  console.log(window.a);// 10
+  ```
