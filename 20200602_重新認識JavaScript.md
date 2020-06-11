@@ -8,7 +8,10 @@
 >[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)  
 >[Day 08 Boolean 的真假判斷](#Day-08-Boolean-的真假判斷)  
 >[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)  
->[Day 10 函式 Functions 的基本概念](Day-10-函式-Functions-的基本概念)
+>[Day 10 函式 Functions 的基本概念](#Day-10-函式-Functions-的基本概念)  
+>[Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](#Day-11-前端工程師的主戰場瀏覽器裡的-JavaScript)  
+>[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)
+
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -619,7 +622,7 @@ console.log(x); //1
   ```
 ### 全域變數與區域變數
 * 全域物件
-  >javascript中沒有所謂全域變數，所以我們說的全域變數其實式全域物件(或叫頂層物件)，全域物件指的就是window，在node環境下叫做global
+  >javascript中沒有所謂全域變數，所以我們說的全域變數其實是全域物件(或叫頂層物件)，全域物件指的就是window，在node環境下叫做global
 * 變數的有效範圍scope的最小切分為function(ES6中的let與const除外)
 * 寫在函式內但沒有var的變數會變成全域變數
 * 全域變數指的是全域物件(頂層物件)的屬性
@@ -627,3 +630,256 @@ console.log(x); //1
   var a = 10;
   console.log(window.a);// 10
   ```
+---
+## [Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](https://ithelp.ithome.com.tw/articles/10191666)
+### JavaScript與網頁前端的關係
+* HTML：負責資料與結構
+* CSS：負責樣式與呈現
+* JavaScript：負責行為與互動
+
+### 瀏覽器裡的JavaScript
+> JavaScript未提供網頁的操作方法，前端網頁的操作方法是由JavaScript的執行平台「瀏覽器」所提供，這些操作方法由BOM、DOM這兩種物件所擁有
+
+#### BOM
+>BOM(Browser Object Model，瀏覽器物件模型)，是瀏覽器功能的核心
+
+![BOMandDOM](imgs/BOMandDOM.png)
+
+#### BOM的核心是**window**物件
+* ECMAScript標準裡的「全域物件」(Global Object)
+* JavaScript與瀏覽器溝通的窗口
+* window物件提供主要的屬性參考上圖
+* BOM提供很多API，可以直接操作瀏覽器，例如alert()警告對話框、confirm()、prompt()等
+```javascript
+// 全域作用範圍所宣告的變數 物件 函式都會式全域物件的屬性，
+// 但「無法」使用delete來刪除
+var a = 123;
+console.log(window.a); //123
+delete a ; //false
+console.log(a); //123
+```
+```javascript
+// 透過window屬性指定的，「可以」使用delete來刪除
+var window.a = 123;
+delete window.a; //true
+console.log(window.a); //undefined
+```
+#### DOM
+> DOM(Document Object Model，文件物件模型)，是一個將HTML文件以樹狀結構來表式的模型，組合起來的樹狀圖稱為DOM Tree
+* 最根部為document
+* DOM API就是定義了讓JavaScript可以存取與改變HTML架構、樣式與內容，以及節點事件綁定。  
+  **範例：取得節點**
+  ```javascript
+  // 根據傳入的值，找到 DOM 中 id 為 'xxx' 的元素。
+  document.getElementById('xxx');
+
+  // 針對給定的 tag 名稱，回傳所有符合條件的 NodeList 物件 [註1]
+  document.getElementsByTagName('xxx');
+
+  // 針對給定的 class 名稱，回傳所有符合條件的 NodeList 物件。
+  document.getElementsByClassName('xxx');
+
+  // 針對給定的 Selector 條件，回傳第一個 或 所有符合條件的 NodeList。
+  document.querySelector('xxx');
+  document.querySelectorAll('xxx');
+
+  /*[註1]: NodeList 物件是節點的集合，可藉由 Node.childNodes 屬性或 document.   querySelectorAll() 等方法取得。 NodeList 雖然有著與陣列相似的特性，但不是陣列，所以也不會有陣列相關的 method 可以使用 (如 map、filter 等)。
+  */
+  ```
+  **範例：取得節點**
+  ```html
+  <h1 id="greet"></h1>
+
+  <script>
+    document.getElementById('#greet').textContent = "hello world";
+  </script>
+  ```
+#### 「DOM」 與「BOM」的區別
+* BOM：JavaScript與「瀏覽器」溝通的窗口，不涉及網頁內容
+* DOM：JavaScript用來控制「網頁」的節點與內容的標準
+---
+## [Day 12 透過 DOM API 查找節點](https://ithelp.ithome.com.tw/articles/10191765)
+> 當網也載入瀏覽器時，瀏覽器會解析HTML檔案，依照HTML內容解析成「DOM」文件物件模型。DOM是W3C的制定的規範，獨立於平台與語言的標準，換言之，只要按照這樣的規範來實作，不管是什麼平台或語言開發，都可以透過DOM提供的API來操作DOM的內容、結構與樣式。
+
+### 前言 script 標籤放哪有差別?
+* 放在head tag之間
+  >無法正確顯示HELLO，主要原因在於瀏覽器解析HTML檔案是「由上至下」依序解讀，此處在解析到head中的script時會暫停解析html而立刻去執行script直到執行完畢後再繼續解析網頁，由於此時尚未產生h1標籤，故無法取得
+  ```html
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <script>
+        document.getElementById("hello").textContent = "HELLO";
+      </script>
+    </head>
+    <body>
+      <h1 id="hello"></h1>
+    </body>
+  </html>
+  ```
+* 放在\<\/body>tag之前
+  >下面範例成功顯示
+  ```html
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+    </head>
+    <body>
+      <h1 id="hello"></h1>
+      <script>
+        document.getElementById("hello").textContent = "HELLO";
+      </script>
+    </body>
+  </html>
+  ```
+### DOM 節點的選取
+> document是DOM Tree的根節點，所以存取HTML時，都是從document物件開始，document節點類型如下
+> * HTML元素節點(element nodes)
+> * 文字節點(text nodes)
+> * 註解節點(comment nodes)
+```javascript
+//常見的DOM選取方法
+
+// 根據傳入的值，找到 DOM 中 id 為 'xxx' 的元素。
+document.getElementById('xxx');
+
+// 針對給定的 tag 名稱，回傳所有符合條件的集合
+document.getElementsByTagName('xxx');
+
+// 針對給定的 class 名稱，回傳所有符合條件的集合
+// IE9 後開始支援
+document.getElementsByClassName('xxx');
+
+// 針對給定的 Selector 條件，回傳第一個 或 所有符合條件的 NodeList。
+// IE8 後開始支援
+document.querySelector('xxx');
+document.querySelectorAll('xxx');
+```
+### DOM 節點的類型
+>The read-only Node.nodeType property is an integer that identifies what the node is. 
+
+ | 節點類型常數               | 對應數值 | 說明                                               |
+ | :------------------------- | :------: | :------------------------------------------------- |
+ | Node.ELEMENT_NODE          |    1     | HTML元素的Element節點                              |
+ | Node.TEXT_NODE             |    3     | 實際文字節點，包括換行與空格                       |
+ | Node.COMMENT_NODE          |    8     | 註解節點                                           |
+ | Node.DOCUMENT_NODE         |    9     | 根節點                                             |
+ | Node_DOCUMENT_TYPE_NODE    |    10    | 文件類型的DocumentType節點，例如HTML5的\<!DOCTYPE> |
+ | Node_DOUMENT_FRAGMENT_NODE |    11    | DocumentFragment節點                               |
+```javascript
+document.nodeType === Node.DOCUMENT_NODE; //true
+document.nodeType === 9 ; //true 
+```
+[MDN Node.nodeType ](https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType)
+
+### DOM 節點間的查找遍歷 (Traversing)
+* 父子關係
+  >除document外，每一個節點都有個上層節點，稱為父節點(Parent node)，相對的下層節點稱為子節點(Child node)
+* 兄弟關係
+  >有同一個父節點稱，且在同一層，那麼他們彼此就是兄弟節點(Siblings node)
+
+#### Node.childNodes
+>The Node.childNodes read-only property returns a live **NodeList** of child nodes of the given element where the first child node is assigned index 0.
+所有DOM節點物件都有childNodes屬性且此種屬性無法修改，我們可透過Node.hasChildNodes()來檢查某個DOM是否有子節點，可能的回值如下
+* HTML元素節點(element nodes)
+* 文字節點(text nodes)，包括空白
+* 註解節點(comment nodes)
+
+```javascript
+var node = document.querySelector("#hello");
+if(node.hasChildNodes()){
+  //可以透過node.childNodes[n] 來取得對應節點
+  //注意，NodeList物件內容為即時更新的集合
+  for(var i = 0;i< node.childNodes[i];i++){
+    ...
+  }
+}
+```
+#### Node.firstChild
+>可以取得Node節點的**第一個**子節點，如果沒有子節點，則返回null
+```html
+<p id="test1">
+  <span>span 1</span>
+  <span>span 2</span>
+  <span>span 3</span>
+</p>
+
+<p id="test2"><span>span 1</span><span>span 2</span><span>span 3</span></p>
+
+<script>
+  var p1 = document.getElementById("test1");
+  var p2 = document.getElementById("test2");
+
+  // tagName 屬性可以取得 node 的標籤名稱
+  console.log(p1.firstChild.tagName);      // undefined
+  console.log(p2.firstChild.tagName);      // SPAN
+</script>
+```
+#### Node.lastChild
+>可以取得Node節點的**最後一個**子節點，如果沒有子節點，則返回null
+
+#### Node.parentNode
+>可以用來取得父元素，回傳值可能會是(元素節點、根節點或DocumentFragment節點)
+```html
+<p>
+    <span>span 1</span>
+    <span>span 2</span>
+    <span>span 3</span>
+</p>
+
+<script>
+    var el = document.querySelector('span');
+    console.log(el.parentNode.nodeName);    // "P"
+    console.log(el.textContent); //span 1
+</script>
+```
+#### Node.previousSibling
+>可以取得同層之間的**前一個**節點，如果node已經是第一個節點，則返回null
+```html
+<p>
+    <span>span 1</span>
+    <span>span 2</span>
+    <span>span 3</span>
+</p>
+
+<script>
+    var el = document.querySelectorAll('span');
+    console.log(el[0].previousSibling); // null
+    console.log(el[2].previousSibling.textContext); //span 2
+</script>
+```
+#### Node.lastSibling
+>可以取得同層之間的下一個節點，如果該節點已經是最後一個，則返回null
+
+#### document.getElementsBy**與document.querySelector/document.querySelectorAll差異
+* document.getElementsBy** 回傳「HTMLCollection」
+  >HTMLCollection只蒐集HTMLElement節點
+* document.querySelectorAll 回傳「NodeList」
+  >NodeList除了蒐集HTMLElement也包含屬性節點、文字節點等
+
+**注意：**HTMLCollection/NodeList大部分情況下是**即時更新**的，但透過document.querySelector/document.querySelectorAll取得的NodeList是**靜態的**
+```html
+ <div id="outer">
+        <div id="inner">
+        </div>
+    </div>
+    <script>
+        var el = document.querySelector('span');
+        console.log(el.previousSibling);
+        var el2 = document.querySelectorAll('span');
+        for (var i = 0; i < el2.length; i++) {
+            console.log("span:" + el2[i].textContent);
+        }
+        console.log("=============");
+        var outDiv = document.getElementById("outer");
+        var allDivs = document.getElementsByTagName("div");
+        var allDivs2 = document.querySelectorAll('div');
+        console.log(allDivs.length); //2
+        console.log(allDivs2.length); //2
+        outDiv.innerHTML = '';
+        console.log(allDivs.length); //1
+        console.log(allDivs2.length); //2
+    </script>
+```
