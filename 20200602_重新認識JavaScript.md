@@ -10,8 +10,9 @@
 >[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)  
 >[Day 10 函式 Functions 的基本概念](#Day-10-函式-Functions-的基本概念)  
 >[Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](#Day-11-前端工程師的主戰場瀏覽器裡的-JavaScript)  
->[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)
-
+>[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)  
+>[Day 13 DOM Node 的建立、刪除與修改](#Day-13-DOM-Node-的建立刪除與修改)  
+> [Day 14 事件機制的原理](#Day-14-事件機制的原理)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -699,7 +700,7 @@ console.log(window.a); //undefined
 * DOM：JavaScript用來控制「網頁」的節點與內容的標準
 ---
 ## [Day 12 透過 DOM API 查找節點](https://ithelp.ithome.com.tw/articles/10191765)
-> 當網也載入瀏覽器時，瀏覽器會解析HTML檔案，依照HTML內容解析成「DOM」文件物件模型。DOM是W3C的制定的規範，獨立於平台與語言的標準，換言之，只要按照這樣的規範來實作，不管是什麼平台或語言開發，都可以透過DOM提供的API來操作DOM的內容、結構與樣式。
+> 當網頁載入瀏覽器時，瀏覽器會解析HTML檔案，依照HTML內容解析成「DOM」文件物件模型。DOM是W3C的制定的規範，獨立於平台與語言的標準，換言之，只要按照這樣的規範來實作，不管是什麼平台或語言開發，都可以透過DOM提供的API來操作DOM的內容、結構與樣式。
 
 ### 前言 script 標籤放哪有差別?
 * 放在head tag之間
@@ -883,3 +884,204 @@ if(node.hasChildNodes()){
         console.log(allDivs2.length); //2
     </script>
 ```
+---
+## [Day 13 DOM Node 的建立、刪除與修改](https://ithelp.ithome.com.tw/articles/10191867)
+### DOM節點新增
+* document.createElement(tagName)
+  >建立新HTML元素，在透過appendChild()、insertBefore()、replaceChild()等方法加入到指定位置才會顯示
+* document.createTextNode()
+  >建立文字節點的方法
+  ```javascript
+  //createElement
+  var newDiv = document.createElement('div');
+  newDiv.id ='myDiv';
+  newDiv.className = 'box';
+
+  //createTextNode
+  var textNode = document.createTextNode('hello world');
+  newDiv.appendChild(textNode);
+  ```
+* document.createDocumentFragment()
+  >Node中DocumentFragment算是最特殊的一種，他是一種沒有父層節點的「最小文化物件」。可以把它看成輕量化的Document，如同標準文件一般方式來保存「片段的文件結構」。 
+  * DocumentFragment與直接操作DOM最大的不同是DocumentFragment不是真實的DOM結構，所以DocumentFragment變動不會影響目前的網頁文件，也不會導致回流reflow或影響效能的情況
+  * 當需要進行大量的DOM操作時，使用DocumentFragment效能會比DOM好很多
+  ```html
+  <ul id="myList"></ul>
+  
+  <script>
+  var ul = document.getElementById('myList');
+  var fragment = document.createFragment();
+
+  for(var i =0;i<3;i++){
+    let li = document.createElement('li');
+    li.appendChild(document.createTextNode("Item "+(i+1)));
+    fragment.appendChild(li);
+  }
+  ul.appendChild(fragment);
+  </script>
+  ```
+* document.write()
+  > document要將某內容寫入網頁可以使用write()方法，當頁面解析到document.write()時就會停下來，並且將內容輸出可以是字串也可以是HTML標籤
+  ```javascript
+  document.write("<h1>hello world!!</h1>");
+  //<script type="text/javascript" src="file.js">
+  document.write("<script type=\"text\javascript\" src="\file.js\">"+"<\/script>");
+  ```
+  ```javascript
+  //window.onload表示網頁載入已完成後執行此function，無論網頁有什麼內容，都會被hello world取代
+  window.onload = function(){
+    document.write("hello world");
+  }
+  ```
+### DOM節點的修改與刪除
+* Node.appendChile(childNode)
+  >加入到父容器節點的末端
+* Node.insertBefore(newNode,refNode)
+  >將新節點加入到refNode節點的前面
+* Node.replaceChild(newChildNode,oldChildNode)
+  >將原本的oldChihld由newChild取代  
+* Node.removeChild(childNode)
+  >將指定的childNode移除
+```html
+<ul id="myList">
+  <li>item 1</li>
+  <li>item 2</li>
+  <li>item 3</li>
+</ul>
+
+<script>
+  var myList = document.getElementById('myList');
+  var newListItem = document.createElement('li');
+  var textNode = document.createTextNode("hello world!!");
+  newListItem.appendChild(textNode);
+  myList.appendChild(newListItem);
+
+  //insertBefore
+  var refNode = document.querySelectorAll('li')[1];//取得item 2的節點
+  myList.insertBefore(newListItem,refNode);
+  //replaceChild
+  var oldNode = document.querySelectorAll('li')[0]//取得item 1的節點
+  myList.replaceChild(newListItem,oldNode);
+  //removeChild
+  var removeNode = document.querySelectorAll('li')[0]//取得第一個節點
+  myList.removeChild(removeNode);
+</script>
+```
+---
+## [Day 14 事件機制的原理](https://ithelp.ithome.com.tw/articles/10191970)
+>JavaScript是一個事件驅動(Event-driven)的程式語言，當瀏覽器載入網頁開始讀取後雖然會馬上讀取到JavaScript事件相關的程式碼，但必須等到事件(user點擊、按下鍵盤)被觸發，才會進行對應程式的執行。而「點擊按鈕
+」就被稱為**事件(Event)**，負責處理事件的程式稱為「**事件處理者**」(**Event Handler**)
+### 事件流程Event Flow
+>事件流程(Event Flow)指的是**網頁元素接收事件的順序**
+* 事件冒泡(Event Bubbling)
+  >事件冒泡指的是「從啟動元素的節點開始，逐層往上傳遞」，直到整個網頁的根節點，也就是**document**
+
+  ![bubblePhaseImg](imgs/BubblePhase.png)
+* 事件捕獲(Event Capturing)
+  >事件捕獲與事件冒泡的傳遞順序相反
+
+  ![capturePhaseImg](imgs/CapturePhase.png)
+* Event Flow
+  >事件傳遞有兩種機制，事件兩種都會執行，此處以點擊td為例
+
+  ![EventFlowImg](imgs/EventFlow.png)
+* 檢驗事件流程
+  ```html
+  <div id="parent">
+    父元素
+    <div id="child">子元素</div>
+  </div>
+  ```
+  ```javascript
+  var parent = document.getElementById('parent');
+  var child = document.getElementById('child');
+  // 透過 addEventListener 指定事件的綁定
+  // 第三個參數 true / false 分別代表捕獲/ 冒泡 機制
+
+  parent.addEventListener('click', function () {
+    console.log('Parent Capturing');
+  }, true);
+
+  parent.addEventListener('click', function () {
+    console.log('Parent Bubbling');
+  }, false);
+
+  child.addEventListener('click', function () {
+    console.log('Child Capturing');
+  }, true);
+
+  child.addEventListener('click', function () {
+    console.log('Child Bubbling');
+  }, false);
+  ```
+  點擊子元素，則觸發順序
+  ```javascript
+  "Parent Capturing"
+  "Child Capturing"
+  "Child Bubbling"
+  "Parent Bubbling"
+  ```
+  點擊父元素，則觸發順序，而子層的Bubbling、Capturing觸發順序(按程式碼順序而定)
+  ```javascript
+  "Parent Capturing"
+  "Parent Bubbling"
+  "Child Capturing" //按程式碼順序亦可能先Child Bubbling、Child Capturing
+  "Child Bubbling"
+  ```
+### 事件的註冊綁定
+* on-event 處理器 (HTML 屬性)
+  >對HTML元素來說只要支援某個事件的觸發，可以透過on+事件名的屬性來註冊，但基於程式碼使用性與維護性的考量，不建議以此方式綁定，參考wiki[非侵入式JavaScript](https://zh.wikipedia.org/wiki/%E9%9D%9E%E4%BE%B5%E5%85%A5%E5%BC%8FJavaScript)
+  ```html
+  <button id="btn" onclick="console.log('hello');">Click</button>
+  ```
+* on-event 處理器 (非 HTML 屬性)
+  >像window與document沒有實體元素，我們可以透過DOM API提供的on-event處理器(on-event handler)來處理，實體元素可透DOM API取得DOM後透過on-event handler處理
+  ```javascript
+  window.onload = function(){
+    document.write("hello world");
+  };
+  
+  var btn = document.getElementById('btn');
+  btn.onclick = function(){
+    console.log("hello");
+  };
+  ```
+  #### 解除事件
+  ```javascript
+  btn.onclick = null;
+  ```
+* 事件監聽 EventTarget.addEventListener()
+  >有三個參數分別是「事件名稱」「事件的處理器(觸發執行的function)」「Boolean(決定冒泡或捕獲，default為冒泡)」，此種方式的優點是可以重複指定多個處理器(handler)給同一個元素的同一個事件
+  ```html
+  <button id="btn">Click</button>
+
+  <script>
+    var btn = document.getElementById('btn');
+
+    btn.addEventListener('click', function(){
+      console.log('HI');
+    }, false);
+
+    btn.addEventListener('click', function(){
+      console.log('HELLO');
+    }, false);
+  </script>
+  ```
+  點擊後出現
+  ```javascript
+  "HI"
+  "HELLO"
+  ```
+  #### 解除事件removeEventListener()
+  >參數解釋同addEventListener()，但須注意第二個參數handler必須與先前addEventListener的handler同一個實體
+  ```javascript
+  var btn = document.getElementById('btn');
+  // 把 event handler 拉出來
+  var clickHandler = function(){
+    console.log('HI');
+  };
+  
+  btn.addEventListener('click', clickHandler, false);
+  // 移除 clickHandler， ok!
+  btn.removeEventListener('click', clickHandler, false);
+  ```
