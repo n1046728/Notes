@@ -12,7 +12,9 @@
 >[Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](#Day-11-前端工程師的主戰場瀏覽器裡的-JavaScript)  
 >[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)  
 >[Day 13 DOM Node 的建立、刪除與修改](#Day-13-DOM-Node-的建立刪除與修改)  
-> [Day 14 事件機制的原理](#Day-14-事件機制的原理)
+> [Day 14 事件機制的原理](#Day-14-事件機制的原理)  
+> [Day 15 隱藏在 "事件" 之中的秘密](#Day-15-隱藏在-"事件"-之中的秘密)
+
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -1014,14 +1016,14 @@ if(node.hasChildNodes()){
     console.log('Child Bubbling');
   }, false);
   ```
-  點擊子元素，則觸發順序
+  點擊子元素，則觸發順序，而子層的Bubbling、Capturing觸發順序(按程式碼順序而定)
   ```javascript
   "Parent Capturing"
-  "Child Capturing"
+  "Child Capturing" //child capturing 、child bubbling是程式碼順序而定
   "Child Bubbling"
   "Parent Bubbling"
   ```
-  點擊父元素，則觸發順序，而子層的Bubbling、Capturing觸發順序(按程式碼順序而定)
+  點擊父元素，則
   ```javascript
   "Parent Capturing"
   "Parent Bubbling"
@@ -1084,4 +1086,152 @@ if(node.hasChildNodes()){
   btn.addEventListener('click', clickHandler, false);
   // 移除 clickHandler， ok!
   btn.removeEventListener('click', clickHandler, false);
-  ```
+  ```                                                             
+---
+## [Day 15 隱藏在 "事件" 之中的秘密](https://ithelp.ithome.com.tw/articles/10192015)
+
+### 隱藏在 Handler 中的 "event"
+> 當監聽事件發生的時，瀏覽器會去執行們透過addEventListener()註冊的EventHandler(EvenListener)，也就是我們指定的function。此時EventListener會去建立一個「事件物件」Event Object，裡面包含這個事件有關的屬性，並以「參數」的形式傳給EventHandler
+```html
+<button id="btn">Click</button>
+```
+```javascript
+var btn = document.getElementById("btn");
+btn.addEventListener('click',function(e){
+  console.log(e);
+},false);
+```
+* type：表示事件名稱
+* target：表示觸發事件元素
+* bubbles：表示事件是否在冒泡階段觸發(true/false)
+* pageX/pageY：觸發事件時滑鼠座標在網頁的相對位置
+
+### 阻擋預設行為event.preventDefault()
+> HTML部分元素有預設行為，例如\<a>的連結，或是表單的submit()等等，如果我們需要在這些元素上綁定事件，適時**取消他們的預設行為**是一件很重要的事
+```html
+<a id='link' herf='https://www.google.com'> Google</a>
+```
+綁定click事件，阻止a的預設行為，前往google網站
+```javascript
+var link = document.querySelector('#link');
+link.addEvenListener('click',function(e){
+  e.preventDefault(); //或是function結尾加入return false;
+  console.log('google');
+},false);
+```
+
+### 阻擋事件冒泡傳遞(event.stopPropagation())
+常用情境：一般增強checkbox的易用性，通常會增加一個label標籤，然後for屬性給對應的label
+
+```html
+<label for="xxx">Label2</label>
+  <input type = "checkbox" name="chkbox" id="xxx">
+<!-- 有時因需求不想給太多id 也會寫成以下形式，也有一樣的效果 -->
+<label class="lbl">
+  Label <input type="checkbox" name="chkbox">
+</label>
+```
+```javascript
+var lbl = document.querySelector('.lbl');
+lbl.addEventListener('click',function(e){
+  console.log("lbl click");
+},false);
+```
+點選label會發現，console.log("lbl click")被觸發兩次，發生這樣的問題是因為\<label>包覆checkbox，當點擊label觸發click事件，瀏覽器又將click事件帶給checkbox，而checkbox受事件冒泡影響又再度把事件傳遞給label上導致"lbl click"出現兩次
+```html
+<label class='lbl'>
+  <input type="checkbox" name="chkbox" id="chkbox">
+</label>
+
+```
+```javascript
+var lbl = document.querySelector('.lbl');
+var chkbox = document.getElementById('chkbox');
+lbl.addEventListener('click',function(e){
+  console.log("lbl click");
+},false);
+chkbox.addEventListener('click',function(e){
+  console.log("chkbox click");
+  //若要避免2次lbl click，可在此處加入e.stopPropagation
+  //e.stopPropagation();
+},flase)
+```
+result：
+```javascript
+"lbl click"
+"chkbox click"
+"lbl click"
+```
+#### 注意
+* stopPropagation需放在checkbox才會有效
+* jquery的EventHandler最後加上return false;可達到preventDefault()、stopPropagation()的效果
+* javascript的addEventListener()最後加入return false沒有上述作用，只有在onClick="return false"的情況下才有作用
+
+### 在事件中找回「自己」
+> 當事件觸發，此時this就是觸發事件的元素，以上例來說就是label  
+注意：this代表的是「事件觸發的**目標**」，也就是event.currentTarget而不是e.target
+
+html同上
+```javascript
+//label 
+var lbl = document.querySelector('.btn');
+var chkbox = document.querySelector('#chkbox');
+
+lbl.addEventListener('click',function(e){
+  console.log(e.target.tagName,1);
+  console.log(this.tagName,1);
+},false);
+
+chkbox.addEventListener('click',function(e){
+  console.log(e.target.tagName,2);
+  console.log(this.tagName,2);
+},false);
+```
+按下label觸發click後，result
+```javascript
+"LABEL 1"
+"LABEL 1"
+"INPUT 2"
+"INPUT 2"
+"INPUT 1"
+"LABEL 1"
+```
+* e.target：是觸發事件的元素
+* this是指觸發事件的目標元素，也就是event.currentTarget
+
+### 事件指派(Event Delegation)
+>是指利用前面介紹的事件流程及單一監聽事件來處理多個事件目標
+#### 原始作法
+```html
+<ul id="myList">
+  <li>item 1</li>
+  <li>item 2</li>
+  <li>item 3</li>
+</ul>
+```
+```javascript
+var myList = document.getElementById('myList');
+if(myList.hasChildNode()){
+  for(var i = 0;i< myList.childNodes.length ; i++){
+    //nodeType ===1 代表實體html元素
+    if(myList.childNodes[i]).addEventListener('click',function(e){console.log(this.textContent)},false);
+  }
+}
+```
+此時，若要新增元素至myList，則新節點並不會有click事件註冊，而且是我們不斷的去重複監聽事件，又忘了移除監聽，可能造成memory leak的情形
+#### 事件指派(Event Delegation)
+> click事件由外層的myList來監聽，利用事件傳遞的原理，判斷e.target目標節點時才做動作
+```javascript
+var myList = document.getSelector("#myList");
+myList.addEventListener('click',function(e){
+  if(e.target.tagName.toLowerCase() === 'li'){
+    console.log(e.target.textContext);
+  }
+},false);
+
+//就算加入新元素也有監聽到
+var newListItem = document.createElement('li');
+var textNode = document.createTextNode("hello ");
+newListItem.appendChild(textNode);
+myList.appendChild(newListItem);
+```
