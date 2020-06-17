@@ -12,9 +12,10 @@
 >[Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](#Day-11-前端工程師的主戰場瀏覽器裡的-JavaScript)  
 >[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)  
 >[Day 13 DOM Node 的建立、刪除與修改](#Day-13-DOM-Node-的建立刪除與修改)  
-> [Day 14 事件機制的原理](#Day-14-事件機制的原理)  
-> [Day 15 隱藏在 "事件" 之中的秘密](#Day-15-隱藏在-"事件"-之中的秘密)
-
+>[Day 14 事件機制的原理](#Day-14-事件機制的原理)  
+>[Day 15 隱藏在 "事件" 之中的秘密](#Day-15-隱藏在-"事件"-之中的秘密)  
+>[Day 16 那些你知道與不知道的事件們](#Day-16-那些你知道與不知道的事件們)  
+[Day 17 函式裡的「參數」](#Day-17-函式裡的參數)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -1235,3 +1236,98 @@ var textNode = document.createTextNode("hello ");
 newListItem.appendChild(textNode);
 myList.appendChild(newListItem);
 ```
+---
+## [Day 16 那些你知道與不知道的事件們](https://ithelp.ithome.com.tw/articles/10192175)
+
+### 事件的種類
+  * 介面相關事件
+    >介面相關事件不一定會與使用者對DOM的操作有關係，反而大多與window物件比較相關
+    * load
+      >註冊在window物件上，指的是網頁資源(包括CSS JS 圖片等)全數載入後觸。  
+       如果是img元素的load事件，則表示圖片載入後觸發。
+    * unload、beforeload
+      >事件分別會在離開頁面或是重新整理的時候觸發，而beforeload會跳出對話框詢問使用者是否要離開目前頁面。
+    * error事件
+      >error事件會在document或圖片載入錯誤時觸發，值得一提的是，由於維護性的考量，大多是件會建議使用非侵入式的JavaScript的寫法，另外寫在\<script>標記，只有error事件最適合寫在on-event handler的寫法來處理
+      ```html
+      <img src="image.jpg" onerror="this.src='default.jpg'">
+      ```
+      **注意**：若是網頁在load事件完才註冊error事件的hanler，只會看到叉燒包或破圖的結果，因為error事件不會再被觸發，後來掛上的handler也一樣
+    * resize事件：當瀏覽器(window)或指定元素(element)的尺寸變更時觸發
+    * scroll事件：當瀏覽器(window)或指定元素(element)的捲軸被拉動時觸發
+    * DOMContentLoaded事件
+      >類似於load事件，load事件是「所有」資源都已經被載入完成後才會觸發，而DOMContentLoaded事件是在DOM結構完整的讀取跟解析後就會觸發，不需等外部資源讀取完成
+      ![DOMContentLoadedImg](imgs/DOMContentLoaded.png)
+
+      解決script放在head中讀不到的問題
+      ```html
+      <head>
+        <script>
+          document.addEventListener('DOMContentLoaded',function(e){
+            document.getElementById('hello').textContent = "hello world!";
+          },false)
+        </script>
+      </head>
+      <body>
+        <div id='hello'></div>
+      </body>
+      ```
+  * 滑鼠相關事件
+    >滑鼠相關事件都可以透過event.pageX與event.pageY取得網頁對應的座標
+    * mousedown / mouseup事件
+      >這兩個事件分別會在滑鼠點擊了某個元素「按下」(mousedown)按鈕，以及「放開」(mouseup)按鈕時觸發
+    * click事件：滑鼠點擊某元素時觸發
+    * dbclick事件：當滑鼠連點兩次某元素時觸發
+    * mouseenter / mousemove / mouseleave事件  
+      1.當滑鼠移入某個元素時，會先觸發mouseenter是件  
+      2.滑鼠游標在某個元素中「移動」時，會連續觸發mousemove  
+      3.滑鼠游標離開了這個元素時，才會觸發mouseleave
+  * 鍵盤相關事件
+    >大多會將鍵盤的事件建立在input的輸入框上
+    * keydown事件：「壓下」鍵盤按鍵時會觸發
+    * keypress事件：除了shift Fn CapsLock這三種按鍵按住時會觸發，按著不放會連續觸發
+    * keyup事件：「放開」按鍵時觸發  
+    對同一元素綁定三個事件時執行順序：
+      ```javascript
+      "keydown"
+      "keypress"
+      "keyup"
+      ```
+    **注意：**若想知道使用者按下的按鍵可透過event.keyCode屬性來查詢，[KeyCode對應表](https://gist.github.com/tylerbuchea/8011573)
+
+  * 表單相關事件
+    * input事件：當input textarea以及帶有contenteditable的元素內容被改變時觸發
+    * change事件
+      >當input select  textarea radio checkbox等表單內容被改變時觸發，與input事件不同的是，input事件會在輸入框輸入的當下觸發，而change事件則是目前焦點離開輸入框後才觸發
+    * submit事件：當表單被送出時觸發，通常表單驗證都會在這一步處理，若驗證未通過則return false;
+    * focus事件：當元素被聚焦時觸發
+    * blur事件：當元素失去焦點時觸發
+
+  * 特殊事件
+    * Composition Event(組成事件)：
+    >Composition Event是指compositonstart、compositionend以及compositionupdate，像在google的搜尋框，會用autocomplete(自動完成)的方式給使用者搜尋建議，輸入中文時，通常會透過注音相關的輸入法做輸入，大部分情況針對注音符號、拼音文字去給搜尋建議沒有太大意義，這個時候需要透過Composition Events來為輸入框做加強，透過Composition Events可以觀察使用者在輸入框開啟輸入法(Input Method Editor，IME)時，字組或選字狀態
+    * compositionstart：輸入框內開啟輸入法，且**正在拼字時**觸發
+    * compositionupdate：輸入框內開啟輸入法，且**正在拼字**或**選字時**更改了內容時觸發
+    * compositionend：輸入框內開啟輸入法，拼字或選字**完成**，正要送出至輸入框時觸發
+  
+  * 自訂事件
+    >自訂事件可以用Event Constructor建立，同樣透過addEventListener去監聽，由dispatch決定觸發的時機
+    ```javascript
+    var event = new Event('build');
+    //監聽
+    elem.addEventListener('build',function(e){...},false);
+    //觸發
+    elem.dispatchEvent(event);
+    ```
+    若想要在自訂事件增加更多資料，可透過CustomEvent
+    ```javascript
+    var event = new CustomEvent('build',{'detail':elem.dataset.time})
+    ```
+    那麼在eventHandler就可透過event來接收
+    ```javascript
+    function(e){
+      console.log(e.detail);
+    }
+    ```
+---
+## [Day 17 函式裡的「參數」](https://ithelp.ithome.com.tw/articles/10192368)
