@@ -1331,3 +1331,102 @@ myList.appendChild(newListItem);
     ```
 ---
 ## [Day 17 函式裡的「參數」](https://ithelp.ithome.com.tw/articles/10192368)
+### 一級函式(First class functions)
+> 一級函式指的是你可以將函式存在變數、物件以及陣列之中，同時也可以將函式傳到函式，或由另一個函式來回傳，而且函式具有屬性，因為它實際上是一個「物件」。
+```javascript
+//把函式存到「變數」，呼叫時執行funcA()
+var funcA = function(){console.log("hello world")};
+//把函式存到「陣列」，呼叫時執行funcB[0]()
+var funcB = [funcA]
+//把函式存到「物件」屬性中，呼叫時執行funcC.method()
+var funcC = {method:funcA}
+```
+```javascript
+//把函式當作「參數」傳到另一個函式中
+var funcD = function(func){
+  return func;
+};
+//另一個函式：存放的是funcD，而參數是一個匿名函式
+var runFuncPassedToFuncD = funD(function(){console.log('Hi!')});
+//呼叫另一個函式
+runFuncPassedToFuncD(); //Hi!
+```
+```javascript
+var funcE = function(){};
+funcE.answer = 'yaya';
+console.log(funcE.answer); //yaya
+```
+
+### 函式裡的參數
+>呼叫一個函式時，可以透過「函式名稱」加上小括號的方式，括號內的資料就是「參數」
+```javascript
+var plus = function(numA,numB){return numA+numB;};
+plus(1,2); //3
+plus(2,3); //5
+```
+>定義函式時有指定的參數數量，但是呼叫時並不會對帶入的參數進行檢查，而沒有指定的參數預設會是**undefined**
+```javascript
+plus(1,2,3,4,5);
+plus();// numA,numB 為undefined
+```
+### arguments物件
+>函式被呼叫時，會產生一個arguments物件，此物件的內容就是傳入的參數。arguments並非「陣列」，但他只是帶有索引特性的物件，內件length屬性，其他與陣列完全不同，沒有.map()或.filter()方法，但仍然可以透過 slice 或是 ES6 的 Array.from 來將它轉成一個新的陣列。
+```javascript
+var plus = function(numA,numB){
+  console.log(arguments.length);
+  for(var i = 0;i<arguments.length;++){
+    console.log(i);
+  }
+  return numA + numB;
+};
+plus(1,2,3,4,5) 5 1 2 3 4 5 3
+```
+> argument的另一個屬性callee，指的是目前執行的函式，當我們在函式執行「遞迴」時，可以執行arguments.callee()來達成，這個函數在匿名函式特別有用。但要小心「嚴格模式」下不允許存取arguments.caller與arguments.callee這兩個屬性
+```javascript
+var plus = function(numA,numB){
+  console.log(arguments.callee)};
+  return numA + numB;
+```
+>ES6 的箭頭函式(Arrow Funciton)沒有提供arguments物件
+
+### 以「物件」為參數
+>**將多個參數用「物件」包裝起來**，當遇到函式參數一大堆「**順序不能錯，參數不能漏**」，此時用物件來包裝就會很方便
+```javascript
+var addPerson = function(firstName,lastName,phone,email,gender,birthday,address){....}
+addPerson('james','syu','091234556','abc@gmail.com','male','1900-1-1','XXXXXX');
+var person = {
+  firstName:'james',
+  lastName:'syu',
+  phone:'091234556',
+  email:'abc@gmail.com',
+  gender:'male',
+  birthday:'1900-1-1',
+  address:'XXXXXX'
+}
+//將person作為參數傳入
+addPerson(person);
+```
+### 參數的預設檢查
+>當函式傳少了的那些值會變成undefined，此時就需要對函式進行檢查，可以透過||(OR)運算子來處理
+```javascript
+var plus = function (numA, numB) {
+  numA = numA || 0;
+  numB = numB || 0;
+
+  return numA + numB;
+};
+```
+>被判斷成false的值不只undefined，更嚴謹的寫法
+```javascript
+var plus = function (numA, numB) {
+  numA = (typeof numA !== 'undefined') ? numA : 0;
+  numB = (typeof numB !== 'undefined') ? numB : 0;
+
+  return numA + numB;
+};
+```
+>ES6 可以替參數指定預設值
+```javascript
+var plus = function(numA=0,numB=0){return numA+numB};
+```
+---
