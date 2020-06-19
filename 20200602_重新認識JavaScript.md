@@ -1,21 +1,22 @@
 # 重新認識 JavaScript筆記
 ## Content  
 >[Day 02 JavaScript 簡介](#day-02-javascript簡介)  
->[Day 03 變數與資料型別](#day-03-變數與資料型別)  
->[Day 04 物件、陣列及型別判斷](#day-04-物件陣列及型別判斷)  
->[Day 05 JavaScript_是「傳值」或「傳址」？](#day-05-javascript-是傳值或傳址)  
->[Day 06 運算式與運算子](#Day&nbsp;06&nbsp;運算式與運算子)  
->[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)  
->[Day 08 Boolean 的真假判斷](#Day-08-Boolean-的真假判斷)  
->[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)  
->[Day 10 函式 Functions 的基本概念](#Day-10-函式-Functions-的基本概念)  
->[Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](#Day-11-前端工程師的主戰場瀏覽器裡的-JavaScript)  
->[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)  
->[Day 13 DOM Node 的建立、刪除與修改](#Day-13-DOM-Node-的建立刪除與修改)  
->[Day 14 事件機制的原理](#Day-14-事件機制的原理)  
->[Day 15 隱藏在 "事件" 之中的秘密](#Day-15-隱藏在-"事件"-之中的秘密)  
->[Day 16 那些你知道與不知道的事件們](#Day-16-那些你知道與不知道的事件們)  
-[Day 17 函式裡的「參數」](#Day-17-函式裡的參數)
+[Day 03 變數與資料型別](#day-03-變數與資料型別)  
+[Day 04 物件、陣列及型別判斷](#day-04-物件陣列及型別判斷)  
+[Day 05 JavaScript_是「傳值」或「傳址」？](#day-05-javascript-是傳值或傳址)  
+[Day 06 運算式與運算子](#Day&nbsp;06&nbsp;運算式與運算子)  
+[Day 07 「比較」與自動轉型的規則](#Day-07-比較與自動轉型的規則)  
+[Day 08 Boolean 的真假判斷](#Day-08-Boolean-的真假判斷)  
+[Day 09 流程判斷與迴圈](#Day-09-流程判斷與迴圈)  
+[Day 10 函式 Functions 的基本概念](#Day-10-函式-Functions-的基本概念)  
+[Day 11 前端工程師的主戰場：瀏覽器裡的 JavaScript](#Day-11-前端工程師的主戰場瀏覽器裡的-JavaScript)  
+[Day 12 透過 DOM API 查找節點](#Day-12-透過-DOM-API-查找節點)  
+[Day 13 DOM Node 的建立、刪除與修改](#Day-13-DOM-Node-的建立刪除與修改)  
+[Day 14 事件機制的原理](#Day-14-事件機制的原理)  
+[Day 15 隱藏在 "事件" 之中的秘密](#Day-15-隱藏在-"事件"-之中的秘密)  
+[Day 16 那些你知道與不知道的事件們](#Day-16-那些你知道與不知道的事件們)  
+[Day 17 函式裡的「參數」](#Day-17-函式裡的參數)  
+[Day 18 Callback Function 與 IIFE](#Day-18-Callback-Function-與-IIFE)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -1430,3 +1431,158 @@ var plus = function (numA, numB) {
 var plus = function(numA=0,numB=0){return numA+numB};
 ```
 ---
+## [Day 18 Callback Function 與 IIFE](https://ithelp.ithome.com.tw/articles/10192739)
+### Callback Function
+>Callback Function與一般函式沒有什麼不同，差別在於呼叫執行的時間。函式只會在滿足了某個條件才會被動的去執行，其實就是「**把函式當另一個函式的參數，透過另一個函式來呼叫它**」。  
+
+> 「JavaScript是一個事件區發的(Event-driven)的程式語言」，概念如同：  
+> 辦公室電話響(事件被觸發Event fired) -> 接電話(Event Handler) 
+```javascript
+Office.addEventListener('電話響',function(){/*接電話*/},false);
+```
+### 把函式當作另一個函式的參數
+>希望隔某段時間，執行某件事可以透過window.setTimeout來達成
+```javascript
+// 1000 millisecond = 1 second
+window.setTimeout(function(){},1000); 
+```
+>使用場景：「**控制多個函式間的執行順序**」
+```javascript
+var funcA = function(){
+  console.log("funcA");
+};
+var funcB = function(){
+  console.log("funcB");
+}
+
+funcA();
+funcB();
+/*result：
+  funcA
+  funcB
+*/
+```
+>加上一個隨機生成時間，此時無法確定執行先後
+```javascript
+var funcA = function(){
+  var i = Math.random()+1;
+  window.setTimeout(function(){
+    console.log("funcA");},i*1000);
+};
+var funcB = function(){
+  var i = Math.random()+1;
+  window.setTimeout(function(){
+    console.log("funcB");},i*1000);
+};
+
+funcA();
+funcB();
+```
+>確保執行順序，使用callback function形式來處理，但須注意callback多層之後產生的「波動拳」(a.k.a "CallbackHell")
+```javascript
+//確保先執行funcA在執行funcB，在funcA中加入callback參數
+var funcA = function(callback){
+  var i = Math.random()+1;
+  window.setTimeout(function(){
+    console.log("funcA");
+  },i*1000);
+  if(callback typeof 'function'){
+    callback();
+  };
+};
+
+var funcB = function(){
+  var i = Math.random()+1;
+  setTimeout(function(){
+    console.log("funcB");
+  },i*1000);
+};
+
+funcA(funcB);
+```
+### 立即被呼叫的函式(Immediately Invocked Function Expression,IIFE)
+> 記住JavaScript變數有效範圍的最小單位是以**function**切分
+```javascript
+for(var i = 0;i<5;i++){
+  window.setTimeout(function(){
+    console.log(i);
+  },1000)
+};
+```
+>執行結果，console.log在「一秒鐘之後」，同時印出「五次5」 
+```javascript
+5
+5
+5
+5
+5
+```
+>原因：  
+JavaScript是一個「非同步」的語言，所以在執行程式時，for迴圈並不會等待window.setTimeout執行完才繼續，而是執行階段**一口氣**跑完  
+第0秒時：for迴圈已將五次的setTimeout()執行完  
+第1秒時：function去外層拿取變數i時已經是5，console.log()會在一秒鐘之後印出「五次5」  
+
+>兩個問題待解決：-> 立即被呼叫的特殊函式(IIFE)
+1. console.log印出的順序
+2. console.log執行時間
+
+>IIFE
+```javascript
+// 函式宣告下即呼叫
+(function doSomething(i){
+  //do something
+};)(123); //加一個括號直接執行呼叫
+
+//函式也可以不取名
+(function(i){
+  //do something
+};)(222);
+```
+>Q1 solution：切分變數的有效範圍的最小單位是function，每次迴圈將i傳給內部function保存，不過下述範例for迴圈一次跑完window依序註冊五次timer，所以每個timer等待一秒鐘，同時將變數印出
+```javascript
+for(var i = 0;i<5;i++){
+  //為凸顯差異，將傳入後的參數名改為x
+  //當然因scope的不同，繼續沿用i也是可以
+  (function(x){
+    window.setTimeout(function(){
+      console.log(x);
+    },1000);
+  };)(i);
+};
+
+//result:0 1 2 3 4
+```
+>Q2 solution：修改內部迴圈等待時間
+```javascript
+for(var i = 0;i<5;i++){
+  //為凸顯差異，將傳入後的參數名改為x
+  //當然因scope的不同，繼續沿用i也是可以
+  (function(x){
+    //將1000 改成1000*x
+    window.setTimeout(function(){
+      console.log(x);
+    },1000 * x);
+  };)(i);
+};
+
+//result:0 1 2 3 4
+```
+> IIFE小結：
+> * 迴圈內呼叫function時，可以利用IIFE來參數值保存下來
+> * 減少全域變數的產生，同時避免變數名稱衝突的機會
+> ES6後新增的let與const可以做，且改以{}作為scope，所以可以保留迴圈當下的值
+```javascript
+for(let i = 0 ;i<5;i++){
+  window.setTimeout(function(){
+    console.log(i);
+  },1000);
+};
+```
+> 備註：不了解作者寫的，「如果你有去看過 jQuery 的原始碼，就會發現 jQuery 也用了相同的手法將 window 與 undefined [註2] 保留起來：」
+```javascript
+(function( window, undefined ) {
+
+  // 略...
+
+})( window );
+```
