@@ -16,7 +16,8 @@
 [Day 15 隱藏在 "事件" 之中的秘密](#Day-15-隱藏在-"事件"-之中的秘密)  
 [Day 16 那些你知道與不知道的事件們](#Day-16-那些你知道與不知道的事件們)  
 [Day 17 函式裡的「參數」](#Day-17-函式裡的參數)  
-[Day 18 Callback Function 與 IIFE](#Day-18-Callback-Function-與-IIFE)
+[Day 18 Callback Function 與 IIFE](#Day-18-Callback-Function-與-IIFE)  
+[Day 19 閉包 Closure](#Day-19-閉包-Closure)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -1586,3 +1587,114 @@ for(let i = 0 ;i<5;i++){
 
 })( window );
 ```
+---
+## [Day 19 閉包 Closure](https://ithelp.ithome.com.tw/articles/10193009)
+### 範圍鏈Scope Chain
+> 「切分變數有有效範圍的最小單位是"function"」。如下範例，內層的function inner可以讀取外層宣告的變數，但外層的outer function存取不到內層宣告的變數。若是在自己的層級找不到就會一層一層往外找，最後找到Global為止。這種行為就稱為「範圍鏈」
+
+```javascript
+function outer(){
+  //outer層拿不到變數c
+  //但可以向外找到變數的a
+  //注意如果沒有var宣告b將成為全域變數
+  var b = a * 2;
+
+  function inner(c){
+    //雖然只有宣告c，但因為範圍鏈，所以可以存取到a,b
+    console.log(a,b,c);
+  };
+  inner(b*3);
+};
+//global 層只有a，不認得b,c
+var a = 1;
+outer(a);
+```
+>測驗
+```javascript
+var msg = 'global.';
+function outer(){
+  var msg = 'local.';
+  function inner(){
+    return msg;
+  };
+
+  return inner; //此處回傳的是這個function的參考並非呼叫，呼叫是inner() 
+};
+
+var innerFunc = outer(); //此處是將outer()回傳的結果給innerFunc，也就是inner function的參考
+var result = innerFunc();//此處innerFunc()會呼叫inner()將回傳結果給result
+console.log(result); // local.
+```
+### 必包Clousure
+>當內部(inner)函式被回傳後，除了自己本身的程式碼外，也可以取得內部函式「當時環境」的變數值，記住了當時環境，這就是「閉包」
+
+>此處IIFE，廣義來說也是儲存閉包的作法，執行setTimeout的同時會將變數i鎖起來，延續它的生命
+```javascript
+for(var i =0;i<5;i++){
+  (function(i){
+    window.setTimeout(function(){
+      console.log(i);
+    },1000 *i);
+  })(i);
+}
+```
+>計數器範例
+* 沒有使用閉包：使用全域變數儲存count
+  >當程式碼變多，過多全域變數會造成不可預期的錯誤，像是與同事間的變數名衝突、沒用到的變數無法回收等
+  ```javascript
+  var count =0;
+  function counter(){
+    return ++count;
+  };
+
+  console.log(counter()); //1
+  console.log(counter()); //2
+  console.log(counter()); //3
+  ```
+* 使用閉包
+  ```javascript
+  function counter(){
+    var count = 0;
+    function innerCounter(){
+      return ++count;
+    };
+    return innerCounter;
+  }
+  var countFunc = Counter();
+  console.log( countFunc() ) //1
+  console.log( countFunc() ) //2
+  console.log( countFunc() ) //3
+  ```
+  >進一步簡化
+  ```javascript
+  function counter(){
+    var count = 0;
+    return function(){
+      retrun ++count;
+    };
+  };
+  ```
+  >ES6箭頭函數簡化(Arrow Function)
+  ```javascript
+  function counter(){
+    var count = 0;
+    return () => ++count;
+  };
+  ```
+  >新增另一個計數器，閉包寫法將是兩個「獨立」計數器實體，彼此互不干擾
+  ```javascript
+  function counter(){
+    var count =0;
+    return function(){
+      return ++count;
+    }
+  };
+
+  var countFunc = counter();
+  var countFunc2 = counter();
+
+  console.log(countFunc()); //1
+  console.log(countFunc()); //2
+  console.log(countFunc2()); //1
+  console.log(countFunc2()); //2
+  ```
