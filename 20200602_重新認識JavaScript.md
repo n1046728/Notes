@@ -17,7 +17,8 @@
 [Day 16 那些你知道與不知道的事件們](#Day-16-那些你知道與不知道的事件們)  
 [Day 17 函式裡的「參數」](#Day-17-函式裡的參數)  
 [Day 18 Callback Function 與 IIFE](#Day-18-Callback-Function-與-IIFE)  
-[Day 19 閉包 Closure](#Day-19-閉包-Closure)
+[Day 19 閉包 Closure](#Day-19-閉包-Closure)  
+[Day 20 What's "THIS" in JavaScript (鐵人精華版)](#Day-20-Whats-THIS-in-JavaScript-鐵人精華版)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -1625,7 +1626,7 @@ var innerFunc = outer(); //此處是將outer()回傳的結果給innerFunc，也�
 var result = innerFunc();//此處innerFunc()會呼叫inner()將回傳結果給result
 console.log(result); // local.
 ```
-### 必包Clousure
+### 閉包Clousure
 >當內部(inner)函式被回傳後，除了自己本身的程式碼外，也可以取得內部函式「當時環境」的變數值，記住了當時環境，這就是「閉包」
 
 >此處IIFE，廣義來說也是儲存閉包的作法，執行setTimeout的同時會將變數i鎖起來，延續它的生命
@@ -1698,3 +1699,199 @@ for(var i =0;i<5;i++){
   console.log(countFunc2()); //1
   console.log(countFunc2()); //2
   ```
+---
+## [Day 20 What's "THIS" in JavaScript (鐵人精華版)](https://ithelp.ithome.com.tw/articles/10193193)
+
+### What's this?
+> 在其他物件導向中，你會知道它會指向某的建構子(Constructor)所建立的物件。JavaScript裡，this所代表的不僅是那個被建立的物件
+* this是JavaScript的關鍵字
+* this是function執行時，自動生成的一個內部物件
+* 隨著function執行場合不同，this所指向的值，也會有所不同
+* 大多數情況下，this代表的就是呼叫function的物件(Owner Object of the function)
+```javascript
+var getGender = function(){
+  return this.gender;
+};
+
+var people1 = {
+  gender :'female',
+  getGender:getFender
+};
+
+var people2 = {
+  gender :'male',
+  getGender:getFender
+};
+
+console.log(people1.getGender()); //female
+console.log(people2.getGender()); //male
+```
+### this不等於function
+> this 代表的是function執行時所屬的物件，而不是function本身。
+
+>此在for迴圈中執行的foo()中的this指的是window，由於window.count並未定義，為undefined，執行迴圈後會得到NaN的結果
+```javascript
+var foo = function(){
+  this.count++;
+};
+
+foo.count = 0;
+for(var i =0;i<5;i++){
+  foo();
+};
+
+console.log(foo.count); // 0
+console.log(window.count) //NaN
+```
+>另一個範例，bar、foo皆為window所有，此處的this.a也就是指window.a，由於未定義，所以為undefined
+```javascript
+var bar = function(){
+  console.log(this.a);
+};
+var foo = function(){
+  var a = 123;
+  this.bar();
+};
+
+foo();
+```
+### 巢狀迴圈中的this
+> * JavaScript中，用來切分變數的最小作用範圍(scope)，也就是說有效範圍的單位是function
+> * 當沒有指名this的情況下，預設綁定(Default Binding)this就是「全域物件」window
+```javascript
+var obj = {
+  func1 : function(){
+    console.log(this === obj); // true
+    var func2 = function(){
+      //此處的this 指的是window 
+      console.log(this === obj); // false
+    }; 
+  };
+};
+```
+>ES5的嚴格模式下，會禁止this指定為全域物件
+```javascript
+var obj = {
+  func1 : function(){
+    "use strict";
+    console.log(this === obj); // true
+    var func2 = function(){
+      //宣告成嚴格模式後，此處就會變undefined 
+      console.log(this); // undefined
+    }; 
+  };
+};
+```
+### That or This?
+> 要是我們在callback function加入ajax請求，依據前述，default binding會把這個callback function的this指定給global object，也就是window，解決方式透過另一個參數來對目前的this做參考
+```javascript
+el.addEventListener('click',function(){
+  //透過that參考
+  var that = this;
+  console.log(this.textConent);
+  $ajax('[URL]',function(res){
+    //this.textContent =>undefined
+    console.log(that.textContent,res);
+  });
+},false);
+```
+### 強制指定this的方式
+> javascript有三個可以強制指定的this的方式，分別是bind()、call()、apply()
+#### .bind()
+```javascript
+
+el.addEventListener('click',function(){
+  //透過.bind(this) 來強制指定該scope的this
+  console.log(this.textConent);
+  
+  $ajax('[URL]',function(res){
+    console.log(that.textContent,res);
+  }).bind(this);
+},false);
+```
+```javascript
+var obj = {
+  x : 123;
+};
+var func = function(){
+  console.log(this.x);
+};
+func(); //undefined
+func().bind(obj); //123
+```
+#### 箭頭函式與this
+> 箭頭函式的兩個重要特性，更簡短的函式寫法、this變數強制綁定。但須注意，無論使用'use strict'或再加上.bind()都無法改變this的內容，也不能作為物件建構子(constructor)來使用。Arrow function也需注意，若function內需要用到this的情況時，須留意this是否換人來當
+```javascript
+el.addEventListener('click',function(){
+  //Arrow function 強制指定this至callback function中
+  $ajax('[URL]',res => {
+    console.log(this.textContent,res);
+  });
+},false);
+```
+#### .call()與.apply()
+> .call與.apply()都是呼叫函數執行，並**將這個function的context替換成第一個參數帶入的物件**，例如強制指定某物件為該function執行時的this。call與apply只差別在於**傳遞方式**有所不同
+```javascript
+function func(){
+  // do something
+};
+
+//呼叫方式
+func();
+func().call();
+func().applu();
+//參數傳遞
+function funcA(arg1,arg2,arg3,....){
+  //do something
+};
+
+funcA.call(context,arg1,arg2,arg3,....);
+funcA.apply(context,[arg1,arg2,arg3,....]); //陣列為參數
+```
+#### bind,call,apply的差異
+>bind()讓這個function在呼叫前先綁定某個物件，使他不管怎麼呼叫都能有固定的this。例如使用在callback function的場景。而call與apply則是使用在context較常變動的場景，依照**呼叫時的需要帶入不同的物件**作為該function的this。呼叫時立即執行
+
+### this與本文(context)綁定的基本原則
+>this的綁定的原則大致可分為四種：
+* 預設綁定(Default Binding)
+  * 因預設綁定的關係，當function是在普通、未經修飾情況下被呼叫，此時裡面的this會自動指定為**全域物件**
+  * 有加上'use strict'宣告為嚴格模式，原本將this綁定至全域物件的行為將轉至undefined
+* 隱式綁定(Implicit Binding)
+  >即使function被宣告的地方是global scope，只要它成為某個物件參考屬性(reference property)，在那個function被呼叫地當下，該function即被那個物件所包含。
+  ```javascript
+  function func(){
+    console.log(this.a);
+  };
+  var obj = {
+    a : 2,
+    foo : func
+  };
+
+  obj.foo(); //2
+  var func2 = obj.func;
+  func2(); // undefined，因為func2為參考對象是window.func
+  ```
+  >**決定this的關鍵不在於它屬於哪個物件，而是在於function呼叫的時機點**
+* 顯示綁定(Explicit Binding)
+  >透過.bind()/.apply()/.call()直接綁定this的function
+* new 關鍵字綁定
+  >傳統物件導向程式語言，建構子是被附接到類別上的特殊方法，再透過new將class實體化時，這個建構子會被呼叫。JavaScript雖然也有new這個關鍵字，運作時也與類別導向的語言行為類似，但由於JavaScript不是一個類別導向程式語言(而是基於原型的物件導向)，所以它的new運作原理並不相同。
+  >當一個function前面帶有new被呼叫時，會發生
+  * 產生一個新的物件(物件被建構出來)
+  * 新建構的物件會被預設的function的this綁定目標，也就是this會指向新建構的物件
+  * 除非這個function指定了回傳(return)了它自己的替代物件，否則透過new產生的物件會被自動回傳
+  ```javascript
+  function foo(a){
+    this.a = a;
+  };
+  var obj = new foo(123);
+  console.log(obj.a); // 123
+  ```
+  ### 結論What's "this" in JavaScript?
+  * 這個function的呼叫，是透過new進行的嗎？如果是，那麼this就是被建構出來的物件
+  * 這個function是以.call()會.apply()的方式呼叫嗎？或是透過.bind()指定？如果是，那this就是被指定的物件
+  * 這個function呼叫時，是否存在某個物件？如果是，那this就是那個物件
+  * 如果沒有滿足以上條件，則此function裡的this就一定是全域物件，在嚴格模式下則是undefined
+---
+
+  
