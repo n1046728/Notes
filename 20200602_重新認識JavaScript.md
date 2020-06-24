@@ -18,7 +18,12 @@
 [Day 17 函式裡的「參數」](#Day-17-函式裡的參數)  
 [Day 18 Callback Function 與 IIFE](#Day-18-Callback-Function-與-IIFE)  
 [Day 19 閉包 Closure](#Day-19-閉包-Closure)  
-[Day 20 What's "THIS" in JavaScript (鐵人精華版)](#Day-20-Whats-THIS-in-JavaScript-鐵人精華版)
+[Day 20 What's "THIS" in JavaScript (鐵人精華版)](#Day-20-Whats-THIS-in-JavaScript-鐵人精華版)  
+[Day 21 函式的 Combo 技： Cascade](#Day-21-函式的-Combo-技-Cascade)  
+[Day 22 深入理解 JavaScript 物件屬性](#Day-22-深入理解-JavaScript-物件屬性)  
+[Day 23 基本型別包裹器 Primitive Wrapper](#Day-23-基本型別包裹器-Primitive-Wrapper)  
+[Day 24 物件與原型鏈](#day-24-物件與原型鏈)    
+[Day 25 原型與繼承](#day-25-原型與繼承)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -1893,5 +1898,312 @@ funcA.apply(context,[arg1,arg2,arg3,....]); //陣列為參數
   * 這個function呼叫時，是否存在某個物件？如果是，那this就是那個物件
   * 如果沒有滿足以上條件，則此function裡的this就一定是全域物件，在嚴格模式下則是undefined
 ---
+## [Day 21 函式的 Combo 技： Cascade](https://ithelp.ithome.com.tw/articles/10193549)
+> JavaScript允許沒有return回傳值，沒有return的函式預設回傳undefined。如果把沒有return的undefined改成return this就可以有很多變化
 
-  
+>四則運算範例
+```javascript
+var calNum = function(num){
+  this.num = num;
+
+  this.add = function(newNum){
+    this.num += newNum
+  };
+  this.sub = function(newNum){
+    this.num -= newNum
+  };
+  this.multi = function(newNum){
+    this.num *= newNum
+  };
+  this.division = function(newNum){
+    this.num /= newNum
+  };
+};
+```
+```javascript
+var a = new calNum(100);
+console.log(a.num); //100
+a.add(100);
+console.log(a.num); //200
+```
+### Cascade
+>Cascade也有人稱「Fluent Interface」，將先前範例沒有retrun運算function，以this回傳。這樣可以做出方便閱讀，而且一口氣把想要做的事寫在一起。
+```javascript
+var calNum = function(num){
+  this.num = num;
+
+  this.add = function(newNum){
+    this.num += newNum
+    return this;
+  };
+  this.sub = function(newNum){
+    this.num -= newNum
+    return this;
+  };
+  this.multi = function(newNum){
+    this.num *= newNum
+    return this;
+  };
+  this.division = function(newNum){
+    this.num /= newNum
+    return this;
+  };
+};
+```
+```javascript
+var a = calNum(100);
+a.add(100).sub(50);
+console.log(a); // 150
+```
+>另外，像JavaScript原本就有sort()，以及ES6之後的filter()、map()以及reduce()也有類似的特性，差別在於回傳的式同一個型別的物件，但內容是運算後的結果。
+```javascript
+var arr = [1,2,8,0,10,51,23,32,3,7,10,9,18,5];
+//把arr陣列中的奇數過濾出來，個別求平方根，由小至大排序
+var num = arr.filter(function(a){return a%2 !==0;})
+             .map(function(a){return a*a;})
+             .sort(function(a,b){return a-b;});
+console.log(num); //[1,9,25,49,81,529,2601]
+```
+---
+## [Day 22 深入理解 JavaScript 物件屬性](https://ithelp.ithome.com.tw/articles/10193747)
+### Review
+>所有基本型別以外的都是物件型別，基本型別如下：
+* string
+* number
+* boolean
+* null
+* undefined
+* symbol(ES6新增)
+### JavaScript是物件導向的程式語言嗎?
+>Javascript是物件導向程式語言，與其他語言不同的是，它的繼承方法是透過"prototype"來進行實作，大多物件導向程式語言是以類別為基礎(class-based)，但JavaScript沒有class沒有extends，但可以透過「原型」(prototype-based)來建立物件之間的關係
+
+### JavaScript自訂物件
+```javascript
+var person1 = new Object();
+person.name = 'james';
+
+var person2 = {
+  name : 'duke'
+};
+```
+
+### 理解JavaScript建構式
+>如果希望JavaScript能像其他物件導向程式語言有類似class的語法，可以借用函式來達成
+```javascript
+function Person(name ,age ,gender){
+  this.name =name;
+  this.age=age;
+  this.gender=gender;
+
+  this.greeting = function(){
+    console.log('hello my name is '+this.name+'.');
+  };
+};
+
+var james = new Person('james','36', 'female');
+james.greeting(); //hello my name is james.
+```
+>拆解建構流程
+>透過new Person()，傳回的物件會有name、age、gender、greeting屬性，而JavaScript會在背景執行Person.call方法，並將james物件傳入，將james作為this的參考物件，然後把這些屬性都新增到james物件當中，但是即使用此方法建立的物件，物件的屬性仍可以透過 . 來進行存取
+```javascript
+function Person(){
+  //略
+};
+var james = new Person('james',36,'male');
+/*
+  ==> var james = {};
+  ==>Person.call(james,'james',36,'male');
+*/
+
+console.log(james.age);// 36
+```
+
+### 屬性描述器(Property discriptor)
+>ES5開始，可以透過物件模型來存取、刪除、列舉等，這些屬性稱「為屬性描述器」(Property discriptor)，需透過ES5提供的Object.defineProperty()來處理，共可分為六種，除了value之外的值可以不設定外，writable、enumerable及configurable的預設值為true，get、set預設為undefined
+* value：屬性的值
+* writable：定義屬性的值是否可以被更改，false為唯獨
+* enumerable：定義物件是否可以透過fon-in來迭代
+* configurable：定義屬性是否可以被刪除、或修改writable、enumerable及configurable設定
+* get：物件屬性的getter function
+* set：物件屬性的setter function
+
+### Object.defineProperty與Object.getOwnPropertyDescriptor
+```javascript
+//定義物件屬性
+var person = {};
+Object.defineProperty(person,'name',{
+  value:'james'
+});
+//檢查物件屬性的狀態描述
+Object.getOwnPropertyDescriptor(person,'name');
+//{value: "james", writable: false, enumerable: false, configurable: false}
+
+//透過實字方式建立的屬性，預設值會是true
+var person2 = {name : 'james'};
+Object.getOwnPropertyDescriptor(person2,'name');
+//{value: "james", writable: true, enumerable: true, configurable: true}
+```
+>針對物件一次設定多個屬性
+```javascript
+Object.defineProperty(person,'name',{
+  value:'james',
+  writable:false,
+  enumerable:false,
+  configurable:fasle
+});
+// 設定configurable 為false後刪除物件屬性將會回傳false，嚴格模式下會出現TypeError錯誤
+delete person.name; // return false
+```
+### 屬性get與set方法
+>ES5以前可以透過this.getXXX()與this.setXXX()來作為get與set的存取方法，有了ES5的Object.defineProperty可以更直觀處理。
+
+>此處針對name的屬性定義了get與set的方法，實際上透過另一個屬性_name_來作為name屬性的封裝。需注意定義了get與set方法，表示你要自行控制屬性的存取，就不能再去定義value或writable屬性描述
+```javascript
+var person = {};
+Object.defineProperty(person,'name',{
+  get：function(){
+    console.log('get');
+    return this._name_;
+  },
+  set：function(name){
+    console.log('set');
+    this._name_ = name;
+  }
+});
+```
+---
+## [Day 23 基本型別包裹器 Primitive Wrapper](https://ithelp.ithome.com.tw/articles/10193902)
+>JavaScript內建型別可以分為基本型別與物件型別兩大類。而物件型別，又可以再細分幾種建構器(Constructor)：
+* String()
+* Number()
+* Boolean()
+* Array()
+* Object()
+* Function()
+* RegExp()
+* Date()
+* Error()
+* Symbol()
+>這些建構器都可以透過new關鍵字來產生對應物件，這些Constructor都是JavaScript「內建的函式」
+
+### 基本型別包裹器(Primitive Wrapper)
+>在JavaScript中，當我們要試著去存取String、Number與Boolean這三種基本型別的屬性時，它就只會在「那一刻」被轉型為該類別的「物件」，它們的屬性方法由對應的物件所提供，這個對應的物件就是**基本型別包裹器(Primitive Wrapper)**
+```javascript
+var str = 'hello';
+console.log(str.length); //5
+```
+>背後原理：它會透過對應的物件建構器將'hello'包裝成一個String物件，然後回傳對應的屬性後，即刻消滅恢復成基本型別
+```javascript
+var str = new String('hello');
+str.length;
+str = null;
+str = 'hello'
+```
+>分別為物件與基本型別的string設定自訂屬性color，設定時不會出錯，讀取時基本型別的屬性仍是undefined，物件則保留了屬性值
+```javascript
+var str = 'hello';
+typeof str; //string
+var strObj = new String('hello');
+strObj.color = 'red';
+str.color = 'red';
+
+console.log(str.color); //undefined
+console.log(strObj.color); //red
+```
+>包裹器特性
+```javascript
+var nameStr = new String('james');
+typeof nameStr; //String
+nameStr instanceof String ; //true
+typeof nameStr.valueOf(); //string
+
+var num = new Number(123);
+typeof num; //Number
+num instanceof Number; //true
+typeof num.valueOf(); //number
+```
+---
+## [Day 24 物件與原型鏈](https://ithelp.ithome.com.tw/articles/10194154)
+### 原型鏈 Prototype Chain
+>透過「原型」繼承可以**讓本來沒有某個屬性的物件去存取其他物件屬性**。也就是說當某個物件要試著去存取「不存在」的屬性時，那麼JavaScript會往它的[[prototype]]原型物件去尋找。
+```javascript
+//洛克人武器是buster 飛彈
+var rockman = {buster:true};
+var cutman = {cutter:true};
+```
+>透過in判斷某個屬性是否可以透過這個物件來存取
+```javascript
+// 注意，屬性名稱必須是字串
+console.log(buster in rockman); //true
+console.log(cutter in rockman); //false
+```
+>以JavaScript來說，可以透過Object.setPrototypeOf()來指定物件原型的關係。物件原型是物件內部屬性，而且無法直接存取(通常會直接被標示為[[prototype]])。原型繼承規則裡，**同一物件無法指定兩種原型物件**
+```javascript
+//承上例
+//指定cutman 為 rockman的 「原型」
+Object.setPropertyOf(rockman,cutman);
+//原型繼承後，洛克人也可以使用剪刀人的武器了
+console.log(cutter in rockman); //true
+```
+>無法指定兩種原型物件
+```javascript
+var gutsman = {superArm : true};
+Object.setPropertyOf(rockman,gutsman);
+console.log(superArm in rockman); //true
+console.log(cutter in rockman); //false
+```
+>原型鏈Prototype Chain
+```javascript
+var rockman = {buster : true};
+var cutman = {cutter : true};
+var gutsman = {superArm : true};
+Object.setPrototypeOf(rockman,cutman);
+Object.setPrototypeOf(cutman,gutsman);
+
+console.log('cutter' in rockman); //true
+console.log('superArm' in rockman); //true
+```
+
+### 最頂層的原型物件：Object.prototype
+>當我們嘗試在某個物件存取一個不存在的物件的屬性時，它會繼續往它的「原型物件」[[prototype]]去尋找，在JavaScript幾乎所有物件(環境宿主物件除外)順著原型鏈找到最頂層級時，都會找到Object.prototype才停止，因為Object.prototype是所有物件的起源。在Object.prototype所提供的所有方法，在JavaScript的所有物件都可以呼叫，例如Object.protorype.hasOwnProperty()、Object.prototype.toStrin()、Object.prototype.valueOf()
+
+### 建構式與原型
+```javascript
+var Person = function(){};
+// 函式也是物件，所以可以透過prototype來擴充每一個透過這個函式所構建的物件
+Person.prototype.sayHello = function(){
+  console.log("hello");
+};
+var person1 = Person(); //此處是直接呼叫結果，所以會是undefined
+var person2 = new Person();
+
+person2.sayHello();// hello
+```
+>建構式中建立同名的方法，當物件實體與它的原型同時擁有同樣的屬性或方法，他會**優先存取自己的屬性或方法**，沒有才會順著原型鏈往上找
+```javascript
+var Person = function(){
+  this.sayHello() = function(){
+    console.log('hihi');
+  };
+};
+Person.prototype.sayHello = function(){
+  console.log('hello');
+};
+var p = new Person();
+p.sayHello(); //hihi
+```
+>小結
+* 物件實體與原型鏈同時擁有相同的屬性或方法，會優先存此自己的屬性或方法
+* 如果物件實體找不到某個屬性或方法時，會往原型物件尋找
+  * 如果在原型物件或更上層原型物件有發現這個屬性，且屬性是描述的writable為true，則會為這物件實體新增對應的屬性或方法
+  * 同上，若該屬性描述writable為false，那麼目標物件就會多出一個「唯讀」的屬性，且事後無法再修改
+  * 如果在原型物件或更上層原型物件有發現這個屬性，但這個屬性是一個「設定器」(setter function)，那麼呼叫的永遠是那個呼叫器，目標物件屬性也沒有辦法被重新定義
+
+>判斷屬性是原型繼承而來，或是物件本身所有，範例如上rockman、cutman、gutsman的Object.prototype.setPropertyOf()範例
+```javascript
+console.log(rockman.hasOwnProperty('buster')); //true
+console.log(rockman.hasOwnProperty('superArm')); //false
+console.log(rockman.hasOwnProperty('cutter')); //false
+```
+---
+## [Day 25 原型與繼承](https://ithelp.ithome.com.tw/articles/10194356)
