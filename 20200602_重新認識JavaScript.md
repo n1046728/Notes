@@ -23,7 +23,8 @@
 [Day 22 深入理解 JavaScript 物件屬性](#Day-22-深入理解-JavaScript-物件屬性)  
 [Day 23 基本型別包裹器 Primitive Wrapper](#Day-23-基本型別包裹器-Primitive-Wrapper)  
 [Day 24 物件與原型鏈](#day-24-物件與原型鏈)    
-[Day 25 原型與繼承](#day-25-原型與繼承)
+[Day 25 原型與繼承](#day-25-原型與繼承)  
+[Day 26 同步與非同步](#day-26-同步與非同步)
 ## Day 02 JavaScript簡介
 ### JavaScript誕生與目標
 >早期網路速度28.8kbits/s的速率，網頁表單驗證透過後端驗證，不具效率，NetScape開發在瀏覽器執行的語言，處理該類簡單的驗證。
@@ -2165,7 +2166,7 @@ console.log('superArm' in rockman); //true
 ```
 
 ### 最頂層的原型物件：Object.prototype
->當我們嘗試在某個物件存取一個不存在的物件的屬性時，它會繼續往它的「原型物件」[[prototype]]去尋找，在JavaScript幾乎所有物件(環境宿主物件除外)順著原型鏈找到最頂層級時，都會找到Object.prototype才停止，因為Object.prototype是所有物件的起源。在Object.prototype所提供的所有方法，在JavaScript的所有物件都可以呼叫，例如Object.protorype.hasOwnProperty()、Object.prototype.toStrin()、Object.prototype.valueOf()
+>當我們嘗試在某個物件存取一個不存在的物件的屬性時，它會繼續往它的「原型物件」[[prototype]]去尋找，在JavaScript幾乎所有物件(環境宿主物件除外)順著原型鏈找到最頂層級時，都會找到Object.prototype才停止，因為Object.prototype是所有物件的起源。在Object.prototype所提供的所有方法，在JavaScript的所有物件都可以呼叫，例如Object.protorype.hasOwnProperty()、Object.prototype.toString()、Object.prototype.valueOf()
 
 ### 建構式與原型
 ```javascript
@@ -2207,3 +2208,290 @@ console.log(rockman.hasOwnProperty('cutter')); //false
 ```
 ---
 ## [Day 25 原型與繼承](https://ithelp.ithome.com.tw/articles/10194356)
+> JavaScript沒有內建class概念，而是透過「原型」，使物件可以繼承自另一個物件，被繼承的物件我們就稱為「原型」。當函式被建立時都會有個原型物件prototype，透過擴充這個prototype的物件，就能讓每一個透過這個函式建構的物件都擁有這個「屬性」或」或「方法」。
+```javascript
+var Person = function(name){
+  this.name = name;
+};
+//在Person.prototype 新增sayHello方法
+Person.prototype.sayHello = function(){
+  return "Hi! I'm "+this.name;
+};
+
+var p = new Person('james');
+p.sayHello(); //Hi I'm james
+
+Person.prototype.sayHi = function(){return 'hi'};
+p.sayHi(); //hi
+```
+>透過new建構的Person的實體時，以上範例就是p，這個p物件的原型物件會自動指向建構式的prototype屬性，也就是Person.prototype
+
+![](imgs/Prototype.png)
+
+>透過原型來新增方法，非常實用，而且是原型新增後馬上可以用。很多「Polyfill」用來擴增舊版本瀏覽器不支援的語法，如Array.prototype.find()，ES6以前不存在，可透過檢查Array.prototype.find是否存在，不存在就可以對Array.prototype.find新增find方法，就可以直接用
+
+### _prototype_與prototype的關係？
+>JavaScript每一個物件都有他的原型物件 **[[prototype]]**。JavaScript沒有提供標準方法方法讓我們對原型物件直接存取，不過大多數瀏覽器(精準來說，大多JavaScript引擎)都有提供一種_proto_的特殊屬性，來讓我們取得物件的原型，但並非所有的瀏覽器都支援。好消息是ES5後可以透過Object.getPrototypeOf()這個標準方法
+```javascript
+var Person = function(name){
+  this.name = name ;
+};
+
+var p = new Person('james');
+Person.prototype.sayHello = funciton(){
+  return 'hello '+this.name;
+};
+
+console.log(Object.getPrototypeOf(p) === Person.prototype); //true
+console.log(Object.getPrototypeOf(p) === Function.prototype); //false
+console.log(Object.getPrototypeOf(Person) === Function.prototype); //true
+
+console.log(p.__proto__ === Person.prototype); //true
+console.log(p.__proto__ === Function.prototype); //false
+console.log(Person.__proto__ === Function.prototype); //true
+```
+>__proto__是順著原型鏈向上取得原型物件的特殊屬性。每一個函式被建立後，都會產生一個prototype屬性，但並**不**代表這個prototype這個屬性就是這個函式的原型物件，而是透過new這個函式建構出來的物件會有個[[prototype]]的隱藏屬性，會指向建構函式的prototype屬性
+
+### 物件原型繼承的方式
+* Object.setPrototypeOf()
+  ```javascript
+  Object.setPrototypeOf(rockman,cutman);
+  ```
+* Object.create()
+ ```javascript
+  var Person = {name : 'default name',
+    sayHello: function(){ 
+      return 'my name is '+this.name
+    }
+  };
+
+  var p = Object.create(Person);
+  p.sayHello(); //my name is default name
+  p.name = 'james';
+  p.sayHello(); //my name is james
+ 
+ ```
+ > Object.create()實作原理
+ ```javascript
+ Object.create = function(proto){
+   function F(){}
+   F.prototype = proto;
+   return new F();
+ };
+ ```
+
+>build-in object像Array、Function..等，它們的prototype屬性是一個物件，繼承自Object.prototype而來
+```javascript
+console.log(Object.getPrototypeOf(Function.prototype) === Object.prototype);//true
+console.log(Funtion.prototyper.__proto__ === Object.prototype);//true
+```
+>原型鏈內物件彼此的關係  
+
+![](imgs/PrototypeObjectFunction.png)
+
+```javascript
+Array.prototype.push('lol');
+//1
+var empty = [];
+//undefined
+empty[0];
+//lol
+```
+---
+## [Day 26 同步與非同步](https://ithelp.ithome.com.tw/articles/10194569)
+### 解釋同步與非同步
+* 非同步(Asynchronous)
+  >以遊戲Overcooked中的番茄沙拉為例，領完食材有番茄、青菜需要處理。但你不需要等到青菜切完才能處理番茄，負責青菜的處理青菜，負責番茄的處理番茄，因此不一定誰先處理完，等到食材處理完再一起裝盤出餐。像這樣處理事件流程不會被「卡住」，就是**非同步**(Asychronous)的概念。
+* 同步(Synchronous)
+  >因為只有一個廚師，所以必須弄完一項之後再去處理另一項，整個流程會被前一個步驟卡住。像這樣先完成A才能做B、C、D的運作方式稱作同步(Sychronous)
+
+### 再見Callback Hell
+>Review
+```javascript
+var funcA = function(){
+  var i = Math.random()+1;
+  window.setTimeout(function(){
+    console.log('functionA');
+  }, i* 1000);
+};
+var funcB = function(){
+  var i = Math.random()+1;
+  window.setTimeout(function(){
+    console.log('functionB');
+  }, i* 1000);
+};
+
+funcA();
+funcB();
+//無法預期是誰先執行完
+```
+>確保執行順序：會將「後續要做的事情，透過參數的方式帶給原本的函式以確保原本函式執行後才呼叫
+```javascript
+var funcA = function(callback){
+  var i = Math.random() +1;
+  window.setTimeout(function(){
+    console.log('functionA');
+  },i*1000);
+  if()
+}
+var funcB = function(){
+  var i = Math.random()+1;
+  window.setTimeout(function(){
+    console.log('functionB');
+    if(typeof callback === 'function'){
+      callback();
+    };
+  }, i* 1000);
+};
+
+funcA(funcB);
+```
+>確保前置作業都完成後才執行後續動作，例如Overcooked，切青菜、切番茄、擺盤完成後上菜。直覺方式建立一個變數管理狀態
+```javascript
+var result = [];
+var step = 3 ;
+
+function funcA(){
+  window.setTimeout(function(){
+    result.push('A');
+    console.log('A');
+    if(result.length === step){
+      funcD();
+    };
+  },(Math.random()+1)*1000);
+};
+function funcB(){
+  window.setTimeout(function(){
+    result.push('B');
+    console.log('B');
+    if(result.length === step){
+      funcD();
+    };
+  },(Math.random()+1)*1000);
+};
+function funcC(){
+  window.setTimeout(function(){
+    result.push('C');
+    console.log('C');
+    if(result.length === step){
+      funcD();
+    };
+  },(Math.random()+1)*1000);
+};
+function funcD(){
+  console.log('上菜!!');
+  result = [];
+};
+
+funcA();
+funcB();
+funcC();
+```
+>避免使用全域變數汙染執行環境
+```javascript
+function serials(tasks,callback){
+  var step = tasks.length;
+  var result = [];
+  function check(r){
+    result.push(r);
+    if(result.length === step){
+      callback();
+    };
+  };
+
+  tasks.forEach(function(f){
+    f(check);
+  });
+};
+```
+```javascript
+function funcA(check){
+  window.setTimeout(function(){
+    console.log('A');
+    check('A');
+  },(Math.random()+1)*1000);
+};
+
+function funcB(check){
+  window.setTimeout(function(){
+    console.log('B');
+    check('B');
+  },(Math.random()+1)*1000);
+};
+
+function funcC(check){
+  window.setTimeout(function(){
+    console.log('C');
+    check('C');
+  },(Math.random()+1)*1000);
+};
+function funcD(){
+  console.log('上菜!!');
+};
+```
+>呼叫
+```javascript
+serials([funcA,funcB,funcC],funcD);
+```
+### Promise物件
+>為了解決同步/非同步的問題，ES6開始新增了一個Promise的特殊物件。各家瀏覽器Promise的實作還不算全面支援，但我們可以透過es6-promise這個polyfill來進行擴充。簡單來說Promise要嘛是「**完成**」，要嘛是「**拒絕**」。
+
+>實際code
+```javascript
+const myFirstPromise = new Promise((resolve,reject) => {
+  resolve(someValue); //完成
+  reject('failure reason'); //拒絕
+});
+```
+>提供一個函式Promise功能，讓他回傳Promise
+```javascript
+function myAsyncFunction(url){
+  return new Promise((resolve,reject) =>{
+    //resolve or reject
+  });
+};
+```
+#### Promise物件狀態
+* pending：初始狀態，不是fullfilled或rejected
+* fulfilled：表示操作成功完成
+* rejected：表是操作失敗
+#### Promise流程圖
+![](imgs/Promise.png)
+#### 依序串聯執行多個Promise功能，透過.then
+```javascript
+function funcA(){
+  return new Promise(function(resolve,reject){
+    window.setTimeout(function(){
+      console.log('A');
+      resolve('A');
+    },(Math.random()+1)*1000);
+  });
+};
+
+function funcB(){
+  return new Promise(function(resolve,reject){
+    window.setTimeout(function(){
+      console.log('B');
+      resolve('B');
+    },(Math.random()+1)*1000);
+  });
+};
+
+function funcC(){
+  return new Promise(function(resolve,reject){
+    window.setTimeout(function(){
+      console.log('C');
+      resolve('C');
+    },(Math.random()+1)*1000);
+  });
+};
+```
+>呼叫
+```javascript
+funcA().then(funcB).then(funcC);
+```
+#### 只關心這三個是否完成，透過Promise.all()
+```javascript
+Promise.all([funcA(),funcB(),funcC()]) 
+        .then(function(){console.log('上菜');});
+```
