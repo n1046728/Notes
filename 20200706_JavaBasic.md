@@ -198,7 +198,7 @@ String path = "https://s.yimg.com/ny/api/res/1.2/02GJwNY0CrsN_1tEGszWDw--~A/YXBw
 		InputStream stream = url.openStream();
 		
 		try(BufferedInputStream bis = new BufferedInputStream(stream);
-			FileOutputStream fos = new FileOutputStream("D:/picsum.jpg");
+			FileOutputStream fos = new FileOutputStream("D:/nadal.jpg");
 			BufferedOutputStream bos = new BufferedOutputStream(fos)){
 			byte[] data = new byte[1];
 			while(bis.read(data) != -1){
@@ -348,3 +348,43 @@ switch(x) {
 ### 抽象類別
 ### 內部類別
 ### 列舉
+
+### Regular Expression
+
+```java
+//first
+Pattern p1 = Pattern.compile("java.");
+Matcher m1 = p1.matcher("java8");
+boolean result1 = m1.matches();
+
+//second
+boolean result2 = Pattern.compile("java.").matcher("java8").matches();
+
+//third
+boolean result3 = Pattern.matches("java.","java8");
+
+```
+### LAB
+* 信用卡格式表示式
+* 身分證格式表示式
+* 電子郵件表示式
+
+## NIO
+```java
+public class Main {
+	public static void main (String [] args) throws IOException {	
+		String path = "https://s.yimg.com/ny/api/res/1.2/02GJwNY0CrsN_1tEGszWDw--~A/YXBwaWQ9aGlnaGxhbmRlcjtzbT0xO3c9ODAw/https://media.zenfs.com/zh-tw/ftvn.com.tw/30bc89774d4b85a8554bd1d1769bce52";
+		URL url = new URL(path);
+		InputStream stream = url.openStream();
+		Path dest = Paths.get("D:/nadal2.jpg");
+		try(BufferedInputStream bis = new BufferedInputStream(stream)){
+			Files.copy(bis, dest, StandardCopyOption.REPLACE_EXISTING);
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			System.out.println("program is done");
+		}
+	}
+}
+
+```
