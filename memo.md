@@ -1,3 +1,15 @@
+## 9/8
+### jasper  
+https://www.tutorialspoint.com/jasper_reports/jasper_getting_started.htm  
+https://www.itread01.com/p/1397806.html  
+https://ithelp.ithome.com.tw/articles/10210719  
+### fastjson  
+https://www.w3cschool.cn/fastjson/fastjson-ex1.html  
+### bootstrapTable.js
+https://webcache.googleusercontent.com/search?q=cache:1h7KIJ6S_CwJ:https://dotblogs.com.tw/ShihGoGo/2017/05/26/164413+&cd=3&hl=zh-TW&ct=clnk&gl=tw  
+### java basic
+https://ithelp.ithome.com.tw/questions/10197446  
+
 ## 9/9  
 ### Sitemesh3 頁面佈局框架  
 https://www.itread01.com/content/1550266212.html
