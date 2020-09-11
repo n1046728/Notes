@@ -33,7 +33,7 @@ print("hello world")
 
 </details>
 
-## 9/10
+## 9/11
 ### 前輩
 > 熟悉框架可以先從簡單的頁面流程開始可以google或直接找專案中程式的簡單範例先吐一個間單的文字檔，之後再try跟db的互動CRUD
 ### eclipse git pull project can't switch branch
