@@ -21,3 +21,24 @@ http://webcache.googleusercontent.com/search?q=cache:udZlCJBjvPMJ:akuma1.pixnet.
 
 ### java 測試  
 https://ithelp.ithome.com.tw/articles/10197623
+
+<details>
+<summary>click</summary>
+<p>
+### fsdfsdf  
+```python
+print("hello world")
+```
+</p>
+
+</details>
+
+## 9/10
+### 前輩
+> 熟悉框架可以先從簡單的頁面流程開始可以google或直接找專案中程式的簡單範例先吐一個間單的文字檔，之後再try跟db的互動CRUD
+### eclipse git pull project can't switch branch
+>1. windows ->show view -> other ->git reposoitory ->project name right click ->property ->remote ->origin-> amend fetch +refs/heads/*:refs/remotes/origin/*
+>2. project right click ->team ->switch to->other ->remote tracking-> choose project you want branch ->click Check_Out btn ->Check out as new local branch->same branch name -- 
+ ->finish
+ ### eclipse git pull project from repository but .java not reference to jar 
+ > project name right click build project
