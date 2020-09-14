@@ -42,3 +42,7 @@ print("hello world")
  ->finish
  ### eclipse git pull project from repository but .java not reference to jar 
  > project name right click build project
+ 
+ ## 9/14
+ ### VSCode PowerShell 中文編碼問題
+	https://webcache.googleusercontent.com/search?q=cache:NsvrKkVj2jcJ:https://blog.darkthread.net/blog/vscode-ps-encoding/+&cd=5&hl=zh-TW&ct=clnk&gl=tw
