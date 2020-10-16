@@ -60,6 +60,20 @@ logger.info(request.getContent());
 esb
 https://zh.wikipedia.org/wiki/%E4%BC%81%E4%B8%9A%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BA%BF
 
+10/16
+---
+jQuery v3.2.1
+jQuery EasyUI 1.4.5
+Bootstrap v3.3.7
+Vue.js v2.3.0
+jQuery Validation Plugin v1.14
+jQuery UI Datepicker 1.12.1
+JSON v3.3.2
+bootstrap-timepicker v0.5.2 
+
+Excel VBA call module 與 Application.run的差異
+https://stackoverflow.com/questions/55266228/difference-between-calling-a-sub-and-application-run
+
 ## finance
 金融控股公司或銀行
 	取得控制性持股之雙重槓桿比率未超過百分之一百二十五。
@@ -109,6 +123,7 @@ https://www.businesstoday.com.tw/article/category/80398/post/201911050018/%E6%B5
 
 槓鈴策略
 https://wiki.mbalib.com/zh-tw/%E6%9D%A0%E9%93%83%E7%AD%96%E7%95%A5
+
 
 ## it
 
