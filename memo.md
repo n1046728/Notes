@@ -74,6 +74,42 @@ bootstrap-timepicker v0.5.2
 Excel VBA call module 與 Application.run的差異
 https://stackoverflow.com/questions/55266228/difference-between-calling-a-sub-and-application-run
 
+2021/2/8
+---
+邁向專業軟體工程師必修的英文課
+半路出家轉職工程師？你該知道的 30 件事
+
+擁抱「資料結構」的「演算法」
+舌尖上的演算法
+
+JavaScript基本功修煉 
+前端常見問題攻略
+
+Angular 8 從推坑到放棄
+Angular 深入淺出三十天
+Angular 大師之路
+
+重修JAVA三十天
+站在Web前端人員角度，學習 Spring Boot 後端開發
+
+
+後端工程師面試必看，我該準備什麼作品集？
+https://tw.alphacamp.co/blog/backend-engineer-job-winning-portfolio
+前端作品集如何準備：7種累積作品的方法
+https://tw.alphacamp.co/blog/front-end-engineer-portfolio-web-developer-job
+
+資料工程師修煉之路
+
+
+
+30天之從 0 至 1 盡可能的建立一個好的系統 (性能基礎篇) 
+
+10 Best System Design Courses for Coding Interviews
+https://medium.com/javarevisited/10-best-system-design-courses-for-coding-interviews-949fd029ce65
+
+Book
+Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems
+
 ## finance
 金融控股公司或銀行
 	取得控制性持股之雙重槓桿比率未超過百分之一百二十五。
