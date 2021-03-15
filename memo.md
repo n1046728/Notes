@@ -163,5 +163,10 @@ https://wiki.mbalib.com/zh-tw/%E6%9D%A0%E9%93%83%E7%AD%96%E7%95%A5
 
 ## it
 
+## sql sp
+https://www.queryexamples.com/sql/stored-procedure/calculating-factorial-of-given-number-with-stored-procedure/
+## sql func
+https://stackoverflow.com/questions/3504932/sql-functions-factorial
+
 
 
