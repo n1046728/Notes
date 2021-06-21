@@ -169,25 +169,3 @@ https://www.queryexamples.com/sql/stored-procedure/calculating-factorial-of-give
 https://stackoverflow.com/questions/3504932/sql-functions-factorial
 
 
- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/pepper-grinder/jquery-ui.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-multidatespicker@1.6.6/jquery-ui.multidatespicker.min.css">
-</head>
-
-<body>
-    <div id="mdp-demo"></div>
-    <div id="datepicker"></div>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqueryui@1.11.1/jquery-ui.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-ui-multidatespicker@1.6.6/jquery-ui.multidatespicker.min.js"></script>
-
-    <script>
-
-        //jqury
-        $(document).ready(function () {
-            var today = new Date();
-            var y = today.getFullYear();
-            $('#mdp-demo').multiDatesPicker({
-                addDates: ['10/14/'+y, '02/19/'+y, '01/14/'+y, '11/16/'+y],
-                numberOfMonths: [3,4],
-                defaultDate: '1/1/'+y
-            });
