@@ -7,35 +7,105 @@
     <title>Calendar Test</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/pepper-grinder/jquery-ui.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-multidatespicker@1.6.6/jquery-ui.multidatespicker.min.css">
+    <style>
+        .highlight a{
+            background-color: #29f274 !important;
+            color: #ffffff !important;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="mdp-demo"></div>
-    <div id="datepicker"></div>
+    <div id="calender"></div>
+    
+    <button onclick='alertTest()'>Alert</button>
+    <button onclick='confirmTest()'>Confirm</button>
+    <input type='text' id='datepicker'>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jqueryui@1.11.1/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-ui-multidatespicker@1.6.6/jquery-ui.multidatespicker.min.js"></script>
-
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
+        
         //jqury
         $(document).ready(function () {
             var today = new Date();
             var y = today.getFullYear();
-            $('#mdp-demo').multiDatesPicker({
-                addDates: ['10/14/'+y, '02/19/'+y, '01/14/'+y, '11/16/'+y],
+            var dateArr = ['2021/12/01', '2021/10/01']
+            console.log(y);
+            $('#calender').multiDatesPicker({
+                dateFormat: 'yy/mm/dd',
+                addDates: dateArr,
                 numberOfMonths: [3,4],
-                defaultDate: '1/1/'+y
+                defaultDate: '2021/01/01',
+                onSelect: async function(dateStr,obj) {
+                    var isExist = dateArr.includes(dateStr);
+                    const { value: text } = await Swal.fire({
+                    input: 'textarea',
+                    inputValue:"1234",
+                    inputLabel: dateStr,
+                    inputPlaceholder: '請輸入'+dateStr+"註解",
+                    inputAttributes: {
+                        'aria-label': 'Type your message here'
+                    },
+                    showCancelButton: true,
+                    showDenyButton:isExist,
+                    confirmButtonText:'Save',
+                    denyButtonText: 'Delete',
+                    }).then(function(result) {
+                        console.log(result);
+                        if (result.value) {
+                            $('#mdp-demo').multiDatesPicker('addDates', dateStr);
+                            dateArr.push(dateStr);
+                            Swal.fire("您按了OK "+dateStr);
+                        }else if(result.isDenied){
+                            $('#mdp-demo').multiDatesPicker('removeDates', dateStr);
+                            const index = array.indexOf(dateStr);
+                            if (index > -1) {
+                                array.splice(index, 1);
+                            }
+                            
+                        }
+                        else {
+                            Swal.fire("您選擇了Cancel");
+                        }
+                    });
+                }
             });
-   
-            //$('.ui-datepicker-prev').hide();
-            //$('.ui-datepicker-next').hide();
-            var dates = $('#mdp-demo').multiDatesPicker('value');
-            console.log(dates);
-            $( "#datepicker" ).datepicker({altFormat: "yy-mm-dd"});
-            var dates2=$('#mdp-demo').multiDatesPicker('gotDate', new Date())
-            console.log(dates2)
+            //$('#mdp-demo').multiDatesPicker('addDates', '2021/12/25');
+            var existArr =  $('#mdp-demo').multiDatesPicker('getDates');
+            console.log("exist:"+existArr);
+            //ui-state-default ui-state-active ui-state-hover
+            $('.ui-datepicker-prev').hide();
+            $('.ui-datepicker-next').hide();
+        
+            // console.log(dates);
+     
+     
+
         });
+        function alertTest() {
+            Swal.fire(
+                "查詢作業失敗", //標題 
+                "您所輸入的序號不存在或是系統被玩壞了!", //訊息內容(可省略)
+                "error" //圖示(可省略) success/info/warning/error/question
+                //圖示範例：https://sweetalert2.github.io/#icons
+            );
+        }
+        function confirmTest() {
+            Swal.fire({
+                title: "操作確認",
+                text: "請點選你想按的按鈕",
+                showCancelButton: true
+            }).then(function(result) {
+               if (result.value) {
+                    Swal.fire("您按了OK");
+               }
+               else {
+                   Swal.fire("您選擇了Cancel");
+               }
+            });
+        }
     </script>
 </body>
 </html>
