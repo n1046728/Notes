@@ -7,104 +7,141 @@
     <title>Calendar Test</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/pepper-grinder/jquery-ui.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-multidatespicker@1.6.6/jquery-ui.multidatespicker.min.css">
-    <style>
-        .highlight a{
-            background-color: #29f274 !important;
-            color: #ffffff !important;
-        }
-    </style>
+
 </head>
 
 <body>
-    <div id="calender"></div>
+    <button onclick='doMDP()'>create</button>
+    <button  onclick='deleteMDP()'>delete</button>
+    <div id="mdp-demo"></div>
+    <div id="modal"></div>
     
-    <button onclick='alertTest()'>Alert</button>
-    <button onclick='confirmTest()'>Confirm</button>
-    <input type='text' id='datepicker'>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqueryui@1.11.1/jquery-ui.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-ui-multidatespicker@1.6.6/jquery-ui.multidatespicker.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
         
         //jqury
         $(document).ready(function () {
-            var today = new Date();
-            var y = today.getFullYear();
-            var dateArr = ['2021/12/01', '2021/10/01']
-            console.log(y);
-            $('#calender').multiDatesPicker({
+            //doMDP();
+        });
+        function deleteMDP(){
+            $('#mdp-demo').multiDatesPicker('resetDates')
+            $('#mdp-demo').multiDatesPicker('destroy');
+        }
+        function doMDP(){
+            console.log('init');
+            initMultiDatePicker();
+        }
+        function initMultiDatePicker(){
+            console.log('initMultiDatePicker');
+            let myMap = new Map([
+                ['2021/12/01', 'one'],
+                ['2021/12/02', 'two'],
+            ]);
+
+            console.log(myMap);
+            console.log($('#mdp-demo').multiDatesPicker('getDates'));
+            $('#mdp-demo').multiDatesPicker({
                 dateFormat: 'yy/mm/dd',
-                addDates: dateArr,
                 numberOfMonths: [3,4],
                 defaultDate: '2021/01/01',
-                onSelect: async function(dateStr,obj) {
-                    var isExist = dateArr.includes(dateStr);
-                    const { value: text } = await Swal.fire({
+                addDates:Array.from(myMap.keys()),
+                onSelect: function(dateStr,obj) {
+                    var d = new Date();
+                    var n = d.getMilliseconds();
+                    console.log("onSelect method:"+ d+' '+n);
+                    console.log('dateStr:'+dateStr);
+                    
+                    $this = $(this);
+                    console.log("obj:"+$this.multiDatesPicker('getDates'));
+                    
+                    const { value: text } = Swal.fire({
                     input: 'textarea',
-                    inputValue:"1234",
+                    inputValue:myMap.get(dateStr)===undefined ? '':myMap.get(dateStr),
                     inputLabel: dateStr,
                     inputPlaceholder: '請輸入'+dateStr+"註解",
                     inputAttributes: {
                         'aria-label': 'Type your message here'
                     },
                     showCancelButton: true,
-                    showDenyButton:isExist,
+                    showDenyButton:true,
                     confirmButtonText:'Save',
                     denyButtonText: 'Delete',
                     }).then(function(result) {
                         console.log(result);
-                        if (result.value) {
+                        
+                        if (result.isConfirmed) {
+                            console.log('click ok');
                             $('#mdp-demo').multiDatesPicker('addDates', dateStr);
-                            dateArr.push(dateStr);
-                            Swal.fire("您按了OK "+dateStr);
-                        }else if(result.isDenied){
-                            $('#mdp-demo').multiDatesPicker('removeDates', dateStr);
-                            const index = array.indexOf(dateStr);
-                            if (index > -1) {
-                                array.splice(index, 1);
-                            }
+                            //$('#mdp-demo').multiDatesPicker('toggleDate',dateStr);
                             
+                            myMap.set(dateStr, result.value);
+                            console.log("obj:"+$this.multiDatesPicker('getDates'));
+                            //Swal.fire("您按了OK "+dateStr);
+                        }else if(result.isDenied){
+                            console.log('click deny');
+                            $('#mdp-demo').multiDatesPicker('removeDates', dateStr);
+                            myMap.delete(dateStr);
+                            console.log("obj:"+$this.multiDatesPicker('getDates'));
+                            // const index = array.indexOf(dateStr);
+                            // if (index > -1) {
+                            //     array.splice(index, 1);
+                            // }
                         }
-                        else {
-                            Swal.fire("您選擇了Cancel");
+                        else if(result.isDismissed){
+                            
+                            if(myMap.has(dateStr)){
+                                $('#mdp-demo').multiDatesPicker('addDates', dateStr);
+                            }else{
+                                $('#mdp-demo').multiDatesPicker('removeDates', dateStr);
+                            }
+                            console.log('click cancel');
+                            console.log("obj:"+$this.multiDatesPicker('getDates'));
+                            //$('#mdp-demo').multiDatesPicker('addDates', dateStr);
+                            //Swal.fire("您選擇了Cancel");
                         }
                     });
                 }
+                
             });
-            //$('#mdp-demo').multiDatesPicker('addDates', '2021/12/25');
-            var existArr =  $('#mdp-demo').multiDatesPicker('getDates');
-            console.log("exist:"+existArr);
-            //ui-state-default ui-state-active ui-state-hover
             $('.ui-datepicker-prev').hide();
             $('.ui-datepicker-next').hide();
-        
-            // console.log(dates);
-     
-     
+            function test(instance) {
+                showModal(instance);
+            }
 
-        });
-        function alertTest() {
-            Swal.fire(
-                "查詢作業失敗", //標題 
-                "您所輸入的序號不存在或是系統被玩壞了!", //訊息內容(可省略)
-                "error" //圖示(可省略) success/info/warning/error/question
-                //圖示範例：https://sweetalert2.github.io/#icons
-            );
-        }
-        function confirmTest() {
-            Swal.fire({
-                title: "操作確認",
-                text: "請點選你想按的按鈕",
-                showCancelButton: true
-            }).then(function(result) {
-               if (result.value) {
-                    Swal.fire("您按了OK");
-               }
-               else {
-                   Swal.fire("您選擇了Cancel");
-               }
-            });
+            function showModal(instance) {
+                $( "#modal" ).dialog({
+                    modal: true,
+                    title: 'Are you sure to select this date?',
+                    buttons:  [
+                    {
+                        text: "OK",
+                        icon: "ui-icon-heart",
+                        click: function() {
+                            console.log(instance);
+                            // $('#mdp-demo').multiDatesPicker('addDates', dateText);
+                            // console.log("obj:"+$(instance).multiDatesPicker('getDates'));
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    {
+                        text: "NO",
+                        icon: "ui-icon-heart",
+                        click: function() {
+                            //$('#mdp-demo').multiDatesPicker('removeDates', dateText);
+                            console.log(instance);
+                            // console.log("obj:"+$(instance).multiDatesPicker('getDates'));
+                            $( this ).dialog( "close" );
+                    }
+                    }
+                    ]
+                });
+            }
         }
     </script>
 </body>
