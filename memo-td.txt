@@ -1,3 +1,16 @@
+## bills
 1. 重要支付系統概述
 https://www.cbc.gov.tw/tw/np-299-1.html
 
+2. 證券款項交割
+https://www.twse.com.tw/zh/page/clearing/operations.html
+
+3. 從我國金融市場金流服務新趨勢探討固定收益商品款項收付新思維
+https://www.tdcc.com.tw/portal/zh/publication/newsletter
+
+4. 短期票券服務
+https://www.tdcc.com.tw/portal/zh/service/bills
+
+5. 外幣結算平台
+「外幣結算平台」之架構設計及系統建置 - 財金資訊股份有限公司
+探討我國「外幣結算平台之服務與發展 - 財金資訊股份有限公司
