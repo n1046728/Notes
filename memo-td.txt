@@ -14,3 +14,21 @@ https://www.tdcc.com.tw/portal/zh/service/bills
 5. 外幣結算平台
 「外幣結算平台」之架構設計及系統建置 - 財金資訊股份有限公司
 探討我國「外幣結算平台之服務與發展 - 財金資訊股份有限公司
+--
+0218
+1. problem solve
+Problem : Caught java.io.CharConversionException
+Solve : https://access.redhat.com/documentation/zh-cn/red_hat_jboss_enterprise_application_platform/7.0/html/configuration_guide/configuring_jvm_settings	
+
+2.Querydsl
+http://querydsl.com/
+
+3.CDI
+http://spirit-blog.logdown.com/posts/566157-contexts-and-dependency-injection-the-new-java-ee-toolbox
+
+4.交易flow
+http://www.cbf.com.tw/ct.asp?xItem=1433&CtNode=387&mp=1
+https://www.bankchb.com/frontend/mashup.jsp?funcId=1a8ef46b15
+
+5.WildFly EJB Development with IntelliJ and Maven
+https://courses.bekwam.net/public_tutorials/bkcourse_wildfly_ejb_devenv.html
